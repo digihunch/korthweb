@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: orthweb
+  name: web-svc
+spec:
+  selector:
+    app: web
+  ports: 
+    - name: dicom 
+      protocol: TCP
+      port: 4242
+      targetPort: 4242 
+    - name: http
+      protocol: TCP
+      port: 8042
+      targetPort: 8042 

@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: web-dpl
+  namespace: orthweb
+  labels:
+    app: web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web 
+    spec:
+      volumes:
+      - name: cmvol
+        configMap:
+          name: orthanc
+          defaultMode: 0755
+      containers:
+      - name: orthanc
+        image: jodogne/orthanc-plugins
+        args: ["/run/secrets/"]
+        ports:
+          - containerPort: 8042
+        env:
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-ha-postgresql-ha-postgresql 
+                key: postgresql-password
+          - name: DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: postgres-ha-postgresql-ha-postgresql 
+                key: postgresql-username
+          - name: DB_ADDR
+            valueFrom:
+              configMapKeyRef:
+                name: orthanc
+                key: db.addr
+          - name: DB_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: orthanc
+                key: db.port
+        volumeMounts:
+        - name: cmvol 
+          mountPath: "/run/secrets/orthanc.json"
+          subPath: "orthanc.json"
+          readOnly: true
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /app/explorer.html
+            port: 8042
+            scheme: HTTP
+            httpHeaders:
+              - name: Authorization
+                value: Basic b3J0aGFuYzpvcnRoYW5j
+          initialDelaySeconds: 10
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 2

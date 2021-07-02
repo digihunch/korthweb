@@ -1,0 +1,20 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: orthweb-cluster
+  region: us-east-1
+nodeGroups:
+  - name: ng-1
+    instanceType: t3.micro 
+    desiredCapacity: 3
+    volumeSize: 80
+    ssh:
+      allow: true # will use ~/.ssh/id_rsa.pub as the default ssh key
+  - name: ng-2
+    instanceType: t3.micro
+    desiredCapacity: 3
+    volumeSize: 80
+    ssh:
+      allow: true
+      #publicKeyPath: ~/.ssh/id_rsa.pub 
+

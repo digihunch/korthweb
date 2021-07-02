@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: orthweb-ingress
+  namespace: orthweb
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+#  tls:
+#  - hosts:
+#      - orthweb.digihunch.com
+#    secretName: tls-orthweb-ingress
+  rules:
+  - host: orthweb.digihunch.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-svc
+            port: 
+              number: 8042 
