@@ -1,20 +1,15 @@
-# orthkube
-orthweb on kubernetes
+# Korthweb
 
-1. Prerequisite
-* eksctl
+Korthweb is a web deployment of Orthanc on Kubernetes (based on AWS EKS)
+
+To deploy this solution, the client and server must have some tools installed:
+* awscli: interact with AWS
+* eksctl: build EKS cluster
 * kubectl
-* helm
-* openssl or cfssl
-Generate CA key and cert
-```sh
-openssl req -x509 -sha256 -newkey rsa:4906 -keyout ca.key -out ca.crt -days 356 -nodes -subj '/CN=Test Cert Authority'
-```
-Generate server key and cert
-```sh
-openssl req -new -newkey rsa:4096 -keyout server.key -out server.csr -nodes -subj '/CN=orthweb.digihunch.com' && openssl x509 -req -sha256 -days 365 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt
-```
-2. Create Kubernetes Cluster 
+* openssl: only if key and certificate need to be created
+* helm: install kubernetes service
+
+## Build EKS cluster
 ```sh
 eksctl create cluster --profile personal \
     --name mytest \
@@ -26,28 +21,21 @@ eksctl create cluster --profile personal \
     --ssh-public-key=~/.ssh/id_rsa.pub \
     --kubeconfig=./kubeconfig.mtest.yaml
 
-eksctl create cluster -f cluster.yaml --profile personal 
+eksctl create cluster -f cluster.yaml --profile personal
 aws eks update-kubeconfig --name basic-cluster
 ```
-3. Install dependency
-Generate and import certificate and key
-
-Generate key and self-signed certificate using OpenSSL (interactive)
+## Prepare Certificate
+Generate CA key and cert
 ```sh
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ca-key.pem -out ca.pem
+openssl req -x509 -sha256 -newkey rsa:4906 -keyout ca.key -out ca.crt -days 356 -nodes -subj '/CN=Test Cert Authority'
+```
+Generate server key and cert
+```sh
+openssl req -new -newkey rsa:4096 -keyout server.key -out server.csr -nodes -subj '/CN=orthweb.digihunch.com'
+openssl x509 -req -sha256 -days 365 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt
 ```
 
-Geneerate key and self-signed certificate using CFSSL with existing configuration:
-```sh
-cfssl gencert -initca site.json | cfssljson -bare ca
-```
-
-import as secrets
-```sh
-kubectl -n orthweb create secret tls tls-orthweb --cert=ca.pem --key=ca-key.pem
-```
-
-4. Install orthanc
+## Deploy Database
 ```sh
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install postgres-ha bitnami/postgresql-ha \
@@ -65,6 +53,9 @@ kubectl -n orthweb create secret generic postgres-ha-postgresql-ha-postgresql --
 # kubectl get secret --namespace orthweb postgres-ha-postgresql-ha-postgresql -o jsonpath="{.data.postgresql-username}" | base64 --decode
 ```
 
+## Deploy Application
+
+
 When Pod dies for unknown reason, check postgres connectivity from within the Pod:
 ```sh
 export PGPASSWORD=$DB_PASSWORD && apt update && apt install postgresql postgresql-contrib
@@ -78,14 +69,12 @@ https://stackoverflow.com/questions/65857360/kubernetes-ingress-tcp-service-ssl-
 Postgres Container Documentation (postgresql.initdbScriptsCM takes *.sql while pgpool.initdbScriptsCM doesn't
 https://artifacthub.io/packages/helm/bitnami/postgresql-ha
 
-
-5. Test
+Manual Test
 
 ```sh
 kubectl -n orthweb port-forward service/web-svc 8042:8042
 curl -X GET 0.0.0.0:8042/app/explorer.html -I -u orthanc:orthanc
 ```
-
 
 Note:
 1. How container args work:
