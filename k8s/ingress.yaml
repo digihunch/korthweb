@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1 
 kind: Ingress
 metadata:
   name: orthweb-ingress
@@ -9,8 +9,8 @@ metadata:
 spec:
   tls:
   - hosts:
-      - orthweb.digihunch.com
-    secretName: tls-orthweb 
+    - orthweb.digihunch.com
+    secretName: tls-orthweb
   rules:
   - host: orthweb.digihunch.com
     http:
@@ -21,4 +21,4 @@ spec:
           service:
             name: web-svc
             port: 
-              number: 8042 
+              number: 8042

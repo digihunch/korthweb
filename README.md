@@ -37,6 +37,7 @@ openssl x509 -req -sha256 -days 365 -in server.csr -CA ca.crt -CAkey ca.key -set
 Now import the certificate and key as secret
 ```sh
 kubectl -n orthweb create secret tls tls-orthweb --cert=server.crt --key=server.key
+kubectl -n nginx-ingress create secret tls default-server-secret --cert=server.crt --key=server.key
 ```
 
 ## Deploy Database
@@ -87,7 +88,7 @@ curl -X GET 0.0.0.0:8042/app/explorer.html -I -u orthanc:orthanc
 SSL termination
 https://stackoverflow.com/questions/65857360/kubernetes-ingress-tcp-service-ssl-termination
 
-Note:
+## Notes
 1. How container args work:
 https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/
 
