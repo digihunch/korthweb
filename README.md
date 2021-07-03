@@ -34,9 +34,15 @@ Generate server key and cert
 openssl req -new -newkey rsa:4096 -keyout server.key -out server.csr -nodes -subj '/CN=orthweb.digihunch.com'
 openssl x509 -req -sha256 -days 365 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt
 ```
+Now import the certificate and key as secret
+```sh
+kubectl -n orthweb create secret tls tls-orthweb --cert=server.crt --key=server.key
+```
 
 ## Deploy Database
+Add init script to config map and then create database
 ```sh
+kubectl apply -f configmap.yaml
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install postgres-ha bitnami/postgresql-ha \
      --create-namespace --namespace orthweb \
@@ -47,15 +53,12 @@ helm install postgres-ha bitnami/postgresql-ha \
      --set postgresql.initdbScriptsCM=orthanc-dbinit
 kubectl get all -n orthweb
 ```
-To add username to secrets and then validate
-```sh
-kubectl -n orthweb create secret generic postgres-ha-postgresql-ha-postgresql --from-literal=postgresql-username=postgres --dry-run -o yaml | kubectl apply -f -
-# kubectl get secret --namespace orthweb postgres-ha-postgresql-ha-postgresql -o jsonpath="{.data.postgresql-username}" | base64 --decode
-```
 
 ## Deploy Application
-
-
+```sh
+kubectl apply -f web-deploy.yaml
+kubectl apply -f web-service.yaml
+```
 When Pod dies for unknown reason, check postgres connectivity from within the Pod:
 ```sh
 export PGPASSWORD=$DB_PASSWORD && apt update && apt install postgresql postgresql-contrib

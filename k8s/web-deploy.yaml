@@ -18,7 +18,7 @@ spec:
       volumes:
       - name: cmvol
         configMap:
-          name: orthanc
+          name: orthanc-app
           defaultMode: 0755
       containers:
       - name: orthanc
@@ -34,18 +34,18 @@ spec:
                 key: postgresql-password
           - name: DB_USERNAME
             valueFrom:
-              secretKeyRef:
-                name: postgres-ha-postgresql-ha-postgresql 
-                key: postgresql-username
+              configMapKeyRef:
+                name: orthanc-app 
+                key: db.user 
           - name: DB_ADDR
             valueFrom:
               configMapKeyRef:
-                name: orthanc
+                name: orthanc-app
                 key: db.addr
           - name: DB_PORT
             valueFrom:
               configMapKeyRef:
-                name: orthanc
+                name: orthanc-app
                 key: db.port
         volumeMounts:
         - name: cmvol 

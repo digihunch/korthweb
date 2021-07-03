@@ -1,7 +1,7 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: orthanc
+  name: orthanc-app
   namespace: orthweb
 data:
   orthanc.json: |
@@ -29,6 +29,7 @@ data:
   db.engine: "postgres"
   db.port: "5432"
   db.addr: "postgres-ha-postgresql-ha-pgpool.orthweb.svc.cluster.local"
+  db.user: postgres
 ---
 kind: ConfigMap
 apiVersion: v1
