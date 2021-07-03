@@ -40,10 +40,16 @@ kubectl -n orthweb create secret tls tls-orthweb --cert=server.crt --key=server.
 ```
 
 ## Deploy Database
-Add init script to config map and then create database
+The initial install of database will require an initialization script which is stored in config map. Create config map from configmap.yaml
 ```sh
 kubectl apply -f configmap.yaml
+```
+We use helm chart provided by Bitnami to install Postgres. If the helm repo has not been added, add it.
+```sh
 helm repo add bitnami https://charts.bitnami.com/bitnami
+```
+Initialize postgres database in HA, with custom options as below:
+```sh
 helm install postgres-ha bitnami/postgresql-ha \
      --create-namespace --namespace orthweb \
      --set pgpool.tls.enabled=true \
@@ -51,6 +57,9 @@ helm install postgres-ha bitnami/postgresql-ha \
      --set pgpool.tls.certFilename=tls.crt \
      --set pgpool.tls.certKeyFilename=tls.key \
      --set postgresql.initdbScriptsCM=orthanc-dbinit
+```
+Monitor the service and deploy status untill all is up:
+```sh
 kubectl get all -n orthweb
 ```
 
@@ -59,25 +68,24 @@ kubectl get all -n orthweb
 kubectl apply -f web-deploy.yaml
 kubectl apply -f web-service.yaml
 ```
-When Pod dies for unknown reason, check postgres connectivity from within the Pod:
+## Troubleshooting Tips
+If Pod does not come to Running status, and is stuck with CreateContainerConfigError, check Pod status details with -o yaml. Consider configuration error such as passing secret data to env variable. 
+```sh
+kubectl -n orthweb get po web-dpl-6ddb587885-wj4cx -o yaml
+```
+If Pod continues to fail, check postgres connectivity from within the Pod. You might need to comment out the args so you can ssh into the Pod and run the followings:
 ```sh
 export PGPASSWORD=$DB_PASSWORD && apt update && apt install postgresql postgresql-contrib
 psql --host=$DB_ADDR --port $DB_PORT --username=$DB_USERNAME sslmode=require
 ```
-CreateContainerConfigError:
-consider configuration error such as passing secret data to env variable.
-
-SSL termination
-https://stackoverflow.com/questions/65857360/kubernetes-ingress-tcp-service-ssl-termination
-Postgres Container Documentation (postgresql.initdbScriptsCM takes *.sql while pgpool.initdbScriptsCM doesn't
-https://artifacthub.io/packages/helm/bitnami/postgresql-ha
-
-Manual Test
-
+For a manual test from kubectl client, use port forwarding: 
 ```sh
 kubectl -n orthweb port-forward service/web-svc 8042:8042
 curl -X GET 0.0.0.0:8042/app/explorer.html -I -u orthanc:orthanc
 ```
+
+SSL termination
+https://stackoverflow.com/questions/65857360/kubernetes-ingress-tcp-service-ssl-termination
 
 Note:
 1. How container args work:
@@ -85,3 +93,5 @@ https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument
 
 2. How http authentication works in readinessprobe
 https://stackoverflow.com/questions/33484942/how-to-use-basic-authentication-in-a-http-liveness-probe-in-kubernetes
+
+3. Postgres Container Documentation (postgresql.initdbScriptsCM takes files with sql extension, while pgpool.initdbScriptsCM doesn't. According to: https://artifacthub.io/packages/helm/bitnami/postgresql-ha
