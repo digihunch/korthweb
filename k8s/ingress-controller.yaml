@@ -34,7 +34,7 @@ spec:
        #prometheus.io/port: "9113"
        #prometheus.io/scheme: http
     spec:
-      #serviceAccountName: nginx-ingress
+      serviceAccountName: nginx-ingress
       containers:
       - image: nginx/nginx-ingress:1.12.0
         imagePullPolicy: IfNotPresent
