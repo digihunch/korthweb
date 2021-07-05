@@ -3,18 +3,39 @@ kind: ClusterConfig
 metadata:
   name: orthweb-cluster
   region: us-east-1
-nodeGroups:
-  - name: ng-1
+  version: "1.20"
+privateCluster:
+  enabled: false
+  additionalEndpointServices:
+  - "cloudformation"
+  - "autoscaling"
+  - "logs"
+vpc:
+  autoAllocateIPv6: false
+  cidr: 192.168.0.0/16
+  clusterEndpoints:
+    privateAccess: false
+    publicAccess: true
+  manageSharedNodeSecurityGroupRules: true 
+  nat: 
+    gateway: Single
+managedNodeGroups:
+  - name: managed-ng-1
     instanceType: t3.micro 
     desiredCapacity: 3
+    minSize: 2
+    maxSize: 4
+    privateNetworking: true
     volumeSize: 80
     ssh:
-      allow: true # will use ~/.ssh/id_rsa.pub as the default ssh key
-  - name: ng-2
+      allow: true 
+  - name: managed-ng-2
     instanceType: t3.micro
     desiredCapacity: 3
+    minSize: 2
+    maxSize: 4
+    privateNetworking: true
     volumeSize: 80
     ssh:
       allow: true
-      #publicKeyPath: ~/.ssh/id_rsa.pub 
 

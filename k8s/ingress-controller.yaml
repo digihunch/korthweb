@@ -76,8 +76,8 @@ spec:
           - -nginx-configmaps=$(POD_NAMESPACE)/nginx-config
           - -default-server-tls-secret=$(POD_NAMESPACE)/default-server-secret
           - -enable-custom-resources=false
-         #- -v=3 # Enables extensive logging. Useful for troubleshooting.
-         #- -report-ingress-status
+          - -v=3 # Enables extensive logging. Useful for troubleshooting.
+          - -report-ingress-status
          #- -external-service=nginx-ingress
          #- -enable-prometheus-metrics
          #- -global-configuration=$(POD_NAMESPACE)/nginx-configuration
