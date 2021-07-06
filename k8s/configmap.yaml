@@ -15,6 +15,11 @@ data:
       "RemoteAccessAllowed" : true,
       "SslEnabled" : true,
       "SslCertificate" : "tls.pem",
+      "DicomTlsEnabled" : true,
+      "DicomTlsCertificate" : "/run/secrets/tls.crt",
+      "DicomTlsPrivateKey" : "/run/secrets/tls.key",
+      "DicomTlsTrustedCertificates" : "/run/secrets/tls.crt",
+      "DicomTlsRemoteCertificateRequired" : false,
       "PostgreSQL" : {
         "EnableIndex" : true,
         "EnableStorage" : true,
