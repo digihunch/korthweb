@@ -3,16 +3,20 @@ kind: Service
 metadata:
   namespace: orthweb
   name: web-svc
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
 spec:
   type: LoadBalancer
   selector:
     app: web
   ports: 
-    - name: dicom 
+    - name: dicomtls 
       protocol: TCP
       port: 4242
       targetPort: 4242 
-    - name: http
+    - name: https
       protocol: TCP
       port: 8042
       targetPort: 8042 

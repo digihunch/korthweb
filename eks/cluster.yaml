@@ -22,7 +22,7 @@ vpc:
 managedNodeGroups:
   - name: managed-ng-1
     instanceType: t3.micro 
-    desiredCapacity: 3
+    desiredCapacity: 2
     minSize: 2
     maxSize: 4
     privateNetworking: true
@@ -31,11 +31,11 @@ managedNodeGroups:
       allow: true 
   - name: managed-ng-2
     instanceType: t3.micro
-    desiredCapacity: 3
+    desiredCapacity: 2
     minSize: 2
     maxSize: 4
     privateNetworking: true
     volumeSize: 80
     ssh:
       allow: true
-
+availabilityZones: ['us-east-1a', 'us-east-1b', 'us-east-1c', 'us-east-1d']

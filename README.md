@@ -1,21 +1,25 @@
 # Korthweb
-
 Korthweb is a web deployment of Orthanc on Kubernetes (based on AWS EKS)
 
 To deploy this solution, the client and server must have some tools installed:
-* awscli: interact with AWS
-* eksctl: build EKS cluster
-* kubectl
-* openssl: only if key and certificate need to be created
-* helm: install kubernetes service
+* awscli: interact with AWS. credential information for programatic access is stored under profile (e.g. default)
+* eksctl: build EKS cluster. It uses a template file, and connect with awscli profile
+* kubectl: context should be reloaded once EKS cluster is built
+* openssl: if key and certificate need to be created
+* helm: install kubernetes service using existing helm chart (e.g. postgres)
 
 ## Build EKS cluster
+We use eksctl with a template to create EKS cluster, then update kubectl configuration pointing to the cluster. the template cluster.yaml is in eks directory.
 ```sh
-eksctl create cluster -f cluster.yaml --profile personal
-aws eks update-kubeconfig --name orthweb-cluster --profile personal --region us-east-1 
+eksctl create cluster -f cluster.yaml --profile default
+aws eks update-kubeconfig --name orthweb-cluster --profile default --region us-east-1 
 ```
 The cluster provisioning may take as long as 20 minutes. 
-## Prepare Certificate
+
+
+## Prepare Certificates and load configuration
+Once cluster is configured, we start with creating cert and load configurations, using the yaml files in k8s directory.
+
 Generate CA key and cert
 ```sh
 openssl req -x509 -sha256 -newkey rsa:4906 -keyout ca.key -out ca.crt -days 356 -nodes -subj '/CN=Test Cert Authority'
@@ -25,18 +29,14 @@ Generate server key and cert
 openssl req -new -newkey rsa:4096 -keyout server.key -out server.csr -nodes -subj '/CN=orthweb.digihunch.com'
 openssl x509 -req -sha256 -days 365 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt
 ```
-Now import the certificate and key as secret
+Create configmap and import the certificate and key as secret
 ```sh
-kubectl apply -f ns.yaml
+kubectl apply -f configmap.yaml
 kubectl -n orthweb create secret tls tls-orthweb --cert=server.crt --key=server.key
-kubectl -n nginx-ingress create secret tls default-server-secret --cert=server.crt --key=server.key
 ```
 
 ## Deploy Database
 The initial install of database will require an initialization script which is stored in config map. Create config map from configmap.yaml
-```sh
-kubectl apply -f configmap.yaml
-```
 We use helm chart provided by Bitnami to install Postgres. If the helm repo has not been added, add it.
 ```sh
 helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -51,7 +51,7 @@ helm install postgres-ha bitnami/postgresql-ha \
      --set pgpool.tls.certKeyFilename=tls.key \
      --set postgresql.initdbScriptsCM=orthanc-dbinit
 ```
-Monitor the service and deploy status untill all is up:
+Monitor the service and deploy status untill all is up. It usually takes a couple minutes.
 ```sh
 kubectl get all -n orthweb
 ```
@@ -61,11 +61,44 @@ kubectl get all -n orthweb
 kubectl apply -f web-deploy.yaml
 kubectl apply -f web-service.yaml
 ```
+The last command brings up a network load balancer, with 8042 (HTTPS) and 4242 (DICOM TLS) ports open. The web-svc status has loadBalancer field under status, which indicates the dns name of load balancer. The DNS name may take a couple minutes to become resolvable. The IP address can be added to local host file like this:
+3.232.159.192 orthweb.digihunch.com 
+The load balancer may take a couple minutes to come up.
 
-## Create Ingress Controller
+## Validation of deployment
+we use curl and echoscu (installed as dcmtk brew package) to validate. Assuming the DNS resolution is working (either by editing /etc/hosts locally or, by adding an A record in DNS)
 ```sh
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.47.0/deploy/static/provider/aws/deploy.yaml
+curl -k -X GET https://orthweb.digihunch.com:8042/app/explorer.html -I -u orthanc:orthanc
+echoscu -v orthweb.digihunch.com 4242 --anonymous-tls +cf ca.crt
+storescu -v -aec ORTHANC --anonymous-tls +cf ca.crt orthweb.digihunch.com 4242 ~/Downloads/CR.dcm
 ```
+The stdout from DICOM C-Echo interaction looks like this:
+```
+I: Requesting Association
+I: Association Accepted (Max Send PDV: 16372)
+I: Sending Echo Request (MsgID 1)
+I: Received Echo Response (Success)
+I: Releasing Association
+```
+The stdout from DICOM C-Store interaction looks like this:
+```
+I: checking input files ...
+I: Requesting Association
+I: Association Accepted (Max Send PDV: 16372)
+I: Sending file: /Users/digihunch/Downloads/CR.dcm
+I: Converting transfer syntax: Little Endian Implicit -> Little Endian Implicit
+I: Sending Store Request (MsgID 1, CR)
+XMIT: ....................................................................................................................................................................................................................................................................................................................................................................................
+I: Received Store Response (Success)
+I: Releasing Association
+``` 
+
+## Clean up
+Use eksctl again to delete cluster:
+```sh
+eksctl delete cluster -f cluster.yaml --profile default
+```
+The deletion takes a couple minutes.
 
 ## Troubleshooting Tips
 If Pod does not come to Running status, and is stuck with CreateContainerConfigError, check Pod status details with -o yaml. Consider configuration error such as passing secret data to env variable. 
