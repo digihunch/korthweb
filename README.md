@@ -80,7 +80,7 @@ psql --host=$DB_ADDR --port $DB_PORT --username=$DB_USERNAME sslmode=require
 For a manual test from kubectl client, use port forwarding: 
 ```sh
 kubectl -n orthweb port-forward service/web-svc 8042:8042
-curl -X GET 0.0.0.0:8042/app/explorer.html -I -u orthanc:orthanc
+curl -k -X GET https://0.0.0.0:8042/app/explorer.html -I -u orthanc:orthanc
 ```
 
 SSL termination

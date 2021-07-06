@@ -8,7 +8,8 @@ data:
     {
       "Name" : "Orthanc Configuration",
       "RemoteAccessAllowed" : true,
-      "SslEnabled" : false,
+      "SslEnabled" : true,
+      "SslCertificate" : "tls.pem",
       "PostgreSQL" : {
         "EnableIndex" : true,
         "EnableStorage" : true,
@@ -17,7 +18,7 @@ data:
         "Database" : "orthancdb",
         "Username" : "${DB_USERNAME}",
         "Password" : "${DB_PASSWORD}",
-        "EnableSsl" : false,
+        "EnableSsl" : true,
         "Lock" : false
       },
       "Plugins" : [
