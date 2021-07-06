@@ -116,14 +116,9 @@ kubectl -n orthweb port-forward service/web-svc 8042:8042
 curl -k -X GET https://0.0.0.0:8042/app/explorer.html -I -u orthanc:orthanc
 ```
 
-SSL termination
-https://stackoverflow.com/questions/65857360/kubernetes-ingress-tcp-service-ssl-termination
-
 ## Notes
-1. How container args work:
-https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/
+1. How container [args](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/) work:
 
-2. How http authentication works in readinessprobe
-https://stackoverflow.com/questions/33484942/how-to-use-basic-authentication-in-a-http-liveness-probe-in-kubernetes
+2. How http authentication works in readiness [probe](https://stackoverflow.com/questions/33484942/how-to-use-basic-authentication-in-a-http-liveness-probe-in-kubernetes).
 
-3. Postgres Container Documentation (postgresql.initdbScriptsCM takes files with sql extension, while pgpool.initdbScriptsCM doesn't. According to: https://artifacthub.io/packages/helm/bitnami/postgresql-ha
+3. Postgres Container Documentation (postgresql.initdbScriptsCM takes files with sql extension, while pgpool.initdbScriptsCM doesn't, according to [this](https://artifacthub.io/packages/helm/bitnami/postgresql-ha)
