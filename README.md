@@ -11,19 +11,10 @@ To deploy this solution, the client and server must have some tools installed:
 
 ## Build EKS cluster
 ```sh
-eksctl create cluster --profile personal \
-    --name mytest \
-    --region=us-east-1 \
-    --tags environment=tesing \
-    --nodes=3 \
-    --version=1.21 \
-    --ssh-access \
-    --ssh-public-key=~/.ssh/id_rsa.pub \
-    --kubeconfig=./kubeconfig.mtest.yaml
-
 eksctl create cluster -f cluster.yaml --profile personal
-aws eks update-kubeconfig --name basic-cluster
+aws eks update-kubeconfig --name orthweb-cluster --profile personal --region us-east-1 
 ```
+The cluster provisioning may take as long as 20 minutes. 
 ## Prepare Certificate
 Generate CA key and cert
 ```sh
@@ -36,6 +27,7 @@ openssl x509 -req -sha256 -days 365 -in server.csr -CA ca.crt -CAkey ca.key -set
 ```
 Now import the certificate and key as secret
 ```sh
+kubectl apply -f ns.yaml
 kubectl -n orthweb create secret tls tls-orthweb --cert=server.crt --key=server.key
 kubectl -n nginx-ingress create secret tls default-server-secret --cert=server.crt --key=server.key
 ```
@@ -69,6 +61,12 @@ kubectl get all -n orthweb
 kubectl apply -f web-deploy.yaml
 kubectl apply -f web-service.yaml
 ```
+
+## Create Ingress Controller
+```sh
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.47.0/deploy/static/provider/aws/deploy.yaml
+```
+
 ## Troubleshooting Tips
 If Pod does not come to Running status, and is stuck with CreateContainerConfigError, check Pod status details with -o yaml. Consider configuration error such as passing secret data to env variable. 
 ```sh

@@ -4,6 +4,7 @@ metadata:
   namespace: orthweb
   name: web-svc
 spec:
+  type: LoadBalancer
   selector:
     app: web
   ports: 
