@@ -2,30 +2,26 @@
 Korthweb is a web deployment of Orthanc on Kubernetes (based on AWS EKS)
 
 To deploy this solution, the client and server must have some tools installed:
-* awscli: interact with AWS. credential information for programatic access is stored under profile (e.g. default)
-* eksctl: build EKS cluster. It uses a template file, and connect with awscli profile
-* kubectl: context should be reloaded once EKS cluster is built
-* openssl: if key and certificate need to be created
-* helm: install kubernetes service using existing helm chart (e.g. postgres)
+* [awscli](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html): we need to install and configure awscli to manage resources in AWS. The credentials for programatic access is stored under profile. Instruction is [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html). Note that we do not directly interact with awscli. The eksctl tool will use its configuration.
+* [eksctl](https://docs.aws.amazon.com/eks/latest/userguide/eksctl.html): build EKS cluster. It uses a template file, and connect with awscli profile to produce a CloudFormation template to create resources required for EKS cluster.
+* [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl): interact with kubernetes cluster using specified context. Once EKS cluster is up, we need to update the context of kubectl so it connect to the EKS cluster correctly.
+* [openssl](https://www.openssl.org/): if you do not have an existing key and certificate, and you need to create self-signed ones. Use OpenSSL, which is usually installed by default on MacOS or Linux.
+* [helm](https://helm.sh/docs/intro/install/): To install postgres database, we leverage existing package (helm chart) to deploy database from a single command.  
 
 ## Build EKS cluster
-We use eksctl with a template to create EKS cluster, then update kubectl configuration pointing to the cluster. the template cluster.yaml is in eks directory.
+We use eksctl with a template to create EKS cluster, then update kubectl configuration pointing to the cluster. The template cluster.yaml is located in eks directory.
 ```sh
 eksctl create cluster -f cluster.yaml --profile default
 aws eks update-kubeconfig --name orthweb-cluster --profile default --region us-east-1 
 ```
-The cluster provisioning may take as long as 20 minutes. 
+The cluster provisioning at this step may take as long as 20 minutes. 
 
 
-## Prepare Certificates and load configuration
-Once cluster is configured, we start with creating cert and load configurations, using the yaml files in k8s directory.
-
-Generate CA key and cert
+## Load configuration
+Once K8s cluster is configured, we load application configuration. 
+If we don't already have key and certificates, let's generate key and certificate for CA, and use it to sign a certificate for our site.
 ```sh
 openssl req -x509 -sha256 -newkey rsa:4906 -keyout ca.key -out ca.crt -days 356 -nodes -subj '/CN=Test Cert Authority'
-```
-Generate server key and cert
-```sh
 openssl req -new -newkey rsa:4096 -keyout server.key -out server.csr -nodes -subj '/CN=orthweb.digihunch.com'
 openssl x509 -req -sha256 -days 365 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt
 ```
@@ -36,12 +32,11 @@ kubectl -n orthweb create secret tls tls-orthweb --cert=server.crt --key=server.
 ```
 
 ## Deploy Database
-The initial install of database will require an initialization script which is stored in config map. Create config map from configmap.yaml
-We use helm chart provided by Bitnami to install Postgres. If the helm repo has not been added, add it.
+The install of database will require an initialization script (stored in ConfigMap orthanc-dbinit from the last step). Before doing that, we want to make sure helm knows where to pick up helm chart for Postgres installation, by adding repo URL:
 ```sh
 helm repo add bitnami https://charts.bitnami.com/bitnami
 ```
-Initialize postgres database in HA, with custom options as below:
+Then we can initialize postgres database in HA, with custom options as below:
 ```sh
 helm install postgres-ha bitnami/postgresql-ha \
      --create-namespace --namespace orthweb \
@@ -51,7 +46,7 @@ helm install postgres-ha bitnami/postgresql-ha \
      --set pgpool.tls.certKeyFilename=tls.key \
      --set postgresql.initdbScriptsCM=orthanc-dbinit
 ```
-Monitor the service and deploy status untill all is up. It usually takes a couple minutes.
+Monitor the service and deploy status until all Pods are up. It usually takes a couple minutes.
 ```sh
 kubectl get all -n orthweb
 ```
@@ -61,8 +56,10 @@ kubectl get all -n orthweb
 kubectl apply -f web-deploy.yaml
 kubectl apply -f web-service.yaml
 ```
-The last command brings up a network load balancer, with 8042 (HTTPS) and 4242 (DICOM TLS) ports open. The web-svc status has loadBalancer field under status, which indicates the dns name of load balancer. The DNS name may take a couple minutes to become resolvable. The IP address can be added to local host file like this:
+The last command brings up a network load balancer, with 8042 (HTTPS) and 4242 (DICOM TLS) ports open. The web-svc status has loadBalancer field under status, which indicates the dns name of load balancer. The DNS name may take a couple minutes to become resolvable. The IP address can be added to local host file (e.g. /etc/hosts for Mac and Linux) like this:
+```
 3.232.159.192 orthweb.digihunch.com 
+```
 The load balancer may take a couple minutes to come up.
 
 ## Validation of deployment
@@ -94,7 +91,7 @@ I: Releasing Association
 ``` 
 
 ## Clean up
-Use eksctl again to delete cluster:
+Use eksctl again to delete cluster so it stops incurring charges.
 ```sh
 eksctl delete cluster -f cluster.yaml --profile default
 ```
