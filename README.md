@@ -1,21 +1,30 @@
 # Korthweb
-Korthweb is a web deployment of Orthanc on Kubernetes (based on AWS EKS)
+Korthweb is a web deployment of Orthanc on Kubernetes (based on AWS EKS, or GCP GKE)
 
-To deploy this solution, the client and server must have some tools installed:
+Tools involved in deployment
 * [awscli](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html): we need to install and configure awscli to manage resources in AWS. The credentials for programatic access is stored under profile. Instruction is [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html). Note that we do not directly interact with awscli. The eksctl tool will use its configuration.
 * [eksctl](https://docs.aws.amazon.com/eks/latest/userguide/eksctl.html): build EKS cluster. It uses a template file, and connect with awscli profile to produce a CloudFormation template to create resources required for EKS cluster.
 * [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl): interact with kubernetes cluster using specified context. Once EKS cluster is up, we need to update the context of kubectl so it connect to the EKS cluster correctly.
 * [openssl](https://www.openssl.org/): if you do not have an existing key and certificate, and you need to create self-signed ones. Use OpenSSL, which is usually installed by default on MacOS or Linux.
 * [helm](https://helm.sh/docs/intro/install/): To install postgres database, we leverage existing package (helm chart) to deploy database from a single command.  
 
-## Build EKS cluster
-We use eksctl with a template to create EKS cluster, then update kubectl configuration pointing to the cluster. The template cluster.yaml is located in eks directory.
+If you deploy on GKE, you can use CloudShell and you do not need awscli or eksctl.
+
+## Build Kubernetes cluster
+
+On AWS, we use eksctl with a template to create EKS cluster, then update kubectl configuration pointing to the cluster. The template cluster.yaml is located in eks directory.
 ```sh
 eksctl create cluster -f cluster.yaml --profile default
 aws eks update-kubeconfig --name orthweb-cluster --profile default --region us-east-1 
 ```
 The cluster provisioning at this step may take as long as 20 minutes. 
 
+On GCP, we use the following commands from CloudShell to provision a GKE cluster, then update kubectl configuration pointing to the cluster.
+```sh
+gcloud config set compute/zone us-east1-b
+gcloud container clusters create orthcluster --num-nodes=3
+gcloud container clusters get-credentials orthcluster
+```
 
 ## Load configuration
 Once K8s cluster is configured, we load application configuration. 
@@ -94,6 +103,10 @@ I: Releasing Association
 Use eksctl again to delete cluster so it stops incurring charges.
 ```sh
 eksctl delete cluster -f cluster.yaml --profile default
+```
+If on GKE, use the following command 
+```sh
+gcloud container clusters delete orthcluster
 ```
 The deletion takes a couple minutes.
 
