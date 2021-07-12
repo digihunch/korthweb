@@ -63,8 +63,8 @@ To delete the cluster
 gcloud container clusters delete orthcluster
 ```
 
-## Deploy Orthanc 
-Once K8s cluster is configured, we can start deploying Orthanc.
+## Deploy Orthanc Manually 
+Once K8s cluster is configured, we can start deploying Orthanc. The files required for manual deployment is located in k8s subdirectory.
 
 ### Prepare Configuration
 If we don't already have key and certificates, let's generate key and certificate for CA, and use it to sign a certificate for our site.
@@ -138,6 +138,10 @@ I: Received Store Response (Success)
 I: Releasing Association
 ``` 
 
+## Deploy Orthanc in a single command using helm chart
+The helm chart is stored in orthanc sub-directory
+
+
 ### Clean up
 If this deployment is for testing only, it is important to clean up environment by deleting the cluster at the end. The steps to delete cluster are under the section Kubernetes Cluster above. The deletion may take a couple minutes.
 
@@ -156,6 +160,7 @@ For a manual test from kubectl client, use port forwarding:
 kubectl -n orthweb port-forward service/web-svc 8042:8042
 curl -k -X GET https://0.0.0.0:8042/app/explorer.html -I -u orthanc:orthanc
 ```
+
 
 ### Notes
 1. How container [args](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/) work.
