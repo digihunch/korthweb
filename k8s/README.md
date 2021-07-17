@@ -76,3 +76,28 @@ I: Releasing Association
 
 ### Clean up
 If this deployment is for testing only, it is important to clean up environment by deleting the cluster at the end. The steps to delete cluster are under the section Kubernetes Cluster above. The deletion may take a couple minutes.
+
+
+### Troubleshooting Tips
+If Pod does not come to Running status, and is stuck with CreateContainerConfigError, check Pod status details with -o yaml. Consider configuration error such as passing secret data to env variable.
+```sh
+kubectl -n orthweb get po web-dpl-6ddb587885-xxxx -o yaml
+```
+If Pod continues to fail, check postgres connectivity from within the Pod. You might need to comment out the args so you can ssh into the Pod and run the followings:
+```sh
+export PGPASSWORD=$DB_PASSWORD && apt update && apt install postgresql postgresql-contrib
+psql --host=$DB_ADDR --port $DB_PORT --username=$DB_USERNAME sslmode=require
+```
+For a manual test from kubectl client, use port forwarding:
+```sh
+kubectl -n orthweb port-forward service/web-svc 8042:8042
+curl -k -X GET https://0.0.0.0:8042/app/explorer.html -I -u orthanc:orthanc
+```
+
+
+### Notes
+1. How container [args](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/) work.
+
+2. How http authentication works in [readiness probe](https://stackoverflow.com/questions/33484942/how-to-use-basic-authentication-in-a-http-liveness-probe-in-kubernetes).
+
+3. Postgres Container Documentation (postgresql.initdbScriptsCM takes files with sql extension, while pgpool.initdbScriptsCM doesn't, according to [this](https://artifacthub.io/packages/helm/bitnami/postgresql-ha)
