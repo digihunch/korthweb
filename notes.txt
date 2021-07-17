@@ -1,0 +1,10 @@
+1. Install
+> helm install orthweb ./orthanc --debug | less
+2. Monitor till pods are up
+> kubectl get po
+3. Turn on port forwarding
+> kubectl port-forward service/orthweb-postgresql-ha-pgpool 5432:5432
+4. Fetch secret
+> kubectl get secret orthweb-postgresql-ha-postgresql -o jsonpath="{.data.postgresql-password}" | base64 --decode
+5. Validate
+> psql --host=localhost --port=5432 --username=postgres

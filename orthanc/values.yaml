@@ -82,6 +82,27 @@ tolerations: []
 affinity: {}
 
 
+## app configuration 
+dbtls:
+  selfsign: true
+  certCommonName: db.orthweb.com
+  certFilename: dbtls.crt 
+  certKeyFileName: dbtls.key
+  certCAFileName: dbtls-ca.crt
+dcmtls:
+  selfsign: true
+  certCommonName: dcm.orthweb.com
+  certFilename: dcmtls.crt 
+  certKeyFileName: dcmtls.key
+  certCAFileName: dcmtls-ca.crt
+https:
+  selfsign: true
+  certCommonName: web.orthweb.com
+  certFilename: https.crt 
+  certKeyFileName: https.key
+  certCAFileName: https-ca.crt
+  
+
 ## PostgreSQL chart configuration
 ## ref: https://github.com/bitnami/charts/blob/master/bitnami/postgresql-ha/values.yaml
 
@@ -92,9 +113,10 @@ postgresql-ha:
   pgpool:
     tls:
       enabled: true
-      certificatesSecret: tls-orthweb
+      certificatesSecret: db.orthweb.com 
       certFilename: tls.crt
       certKeyFilename: tls.key
+      certCAFilename: ca.crt
 
 
 
