@@ -80,3 +80,22 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+
+## PostgreSQL chart configuration
+## ref: https://github.com/bitnami/charts/blob/master/bitnami/postgresql-ha/values.yaml
+
+postgresql-ha:
+  enabled: true
+  postgresql:
+    initdbScriptsCM: orthanc-dbinit
+  pgpool:
+    tls:
+      enabled: true
+      certificatesSecret: tls-orthweb
+      certFilename: tls.crt
+      certKeyFilename: tls.key
+
+
+
+
