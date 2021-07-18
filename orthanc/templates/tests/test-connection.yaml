@@ -10,6 +10,5 @@ spec:
   containers:
     - name: wget
       image: busybox
-      command: ['wget']
-      args: ['{{ include "orthanc.fullname" . }}:{{ .Values.service.port }}']
+      command: ['sh','-c','wget --header="Authorization: Basic {{ "orthanc:orthanc" | b64enc }}" https://{{ include "orthanc.fullname" . }}.{{ $.Release.Namespace }}.svc.cluster.local:{{ .Values.service.httpsPort }}/app/explorer.html']
   restartPolicy: Never

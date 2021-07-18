@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "orthanc.fullname" . }}
+  namespace: {{ $.Release.Namespace | quote }}
   labels:
     {{- include "orthanc.labels" . | nindent 4 }}
 spec:
@@ -27,26 +28,40 @@ spec:
       serviceAccountName: {{ include "orthanc.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: init-mydb
+          image: busybox
+          command: ['sh','-c',"until nc -vz $DB_ADDR $DB_PORT; do echo waiting DB service at $DB_ADDR:$DB_PORT; sleep 3; done"]
+          env:
+            - name: DB_ADDR
+              valueFrom:
+                configMapKeyRef:
+                  name: orthanc-app
+                  key: db.addr
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: orthanc-app
+                  key: db.port
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          #image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          image: jodogne/orthanc-plugins
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           args: ["/run/secrets/"]
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: https
-              containerPort: 8042
+              containerPort: {{ .Values.service.httpsPort }}
               protocol: TCP
-            - name: dicomtls
-              containerPort: 4242
+            - name: dcmtls
+              containerPort: {{ .Values.service.dcmtlsPort }} 
               protocol: TCP
           env:
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: orthweb-postgresql-ha-postgresql
+                  name: "{{ $.Release.Name }}-postgresql-ha-postgresql"
                   key: postgresql-password
             - name: DB_USERNAME
               valueFrom:
@@ -88,10 +103,6 @@ spec:
             postStart:
               exec:
                 command: ['/bin/sh','-c',' cat /run/secrets/web-tls.key /run/secrets/web-tls.crt > /run/secrets/web-tls.pem']
-          #livenessProbe:
-          #  httpGet:
-          #    path: /
-          #    port: http
           readinessProbe:
             httpGet:
               path: /app/explorer.html
@@ -99,7 +110,7 @@ spec:
               scheme: HTTPS
               httpHeaders:
                 - name: Authorization
-                  value: Basic b3J0aGFuYzpvcnRoYW5j
+                  value: Basic {{ "orthanc:orthanc" | b64enc }}  
             failureThreshold: 3
             initialDelaySeconds: 10
             periodSeconds: 20

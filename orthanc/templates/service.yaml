@@ -2,14 +2,23 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "orthanc.fullname" . }}
+  namespace: {{ $.Release.Namespace | quote }}
   labels:
     {{- include "orthanc.labels" . | nindent 4 }}
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
+    - name: https
+      port: {{ .Values.service.httpsPort }}
+      targetPort: {{ .Values.service.httpsPort }} 
       protocol: TCP
-      name: http
+    - name: dcmtls
+      port: {{ .Values.service.dcmtlsPort }}
+      targetPort: {{ .Values.service.dcmtlsPort }} 
+      protocol: TCP
   selector:
     {{- include "orthanc.selectorLabels" . | nindent 4 }}
