@@ -1,0 +1,27 @@
+{  
+  "Name" : "Orthanc Configuration",
+  "RemoteAccessAllowed" : true,
+  "SslEnabled" : true,
+  "SslCertificate" : "tls.pem",
+  "DicomTlsEnabled" : true,
+  "DicomTlsCertificate" : "/run/secrets/tls.crt",
+  "DicomTlsPrivateKey" : "/run/secrets/tls.key",
+  "DicomTlsTrustedCertificates" : "/run/secrets/tls.crt",
+  "DicomTlsRemoteCertificateRequired" : false,
+  "PostgreSQL" : {
+    "EnableIndex" : true,
+    "EnableStorage" : true,
+    "Host" : "${DB_ADDR}",
+    "Port" : ${DB_PORT},
+    "Database" : "orthancdb",
+    "Username" : "${DB_USERNAME}",
+    "Password" : "${DB_PASSWORD}",
+    "EnableSsl" : true,
+    "Lock" : false
+  },
+  "Plugins" : [
+    "/usr/local/share/orthanc/plugins/libOrthancPostgreSQLIndex.so",
+    "/usr/local/share/orthanc/plugins/libOrthancPostgreSQLStorage.so",
+    "/usr/local/share/orthanc/plugins/libOrthancWebViewer.so"
+  ]
+}
