@@ -31,22 +31,95 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          #image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: jodogne/orthanc-plugins
+          args: ["/run/secrets/"]
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
-              containerPort: 80
+            - name: https
+              containerPort: 8042
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
+            - name: dicomtls
+              containerPort: 4242
+              protocol: TCP
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: orthweb-postgresql-ha-postgresql
+                  key: postgresql-password
+            - name: DB_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: orthanc-app
+                  key: db.user
+            - name: DB_ADDR
+              valueFrom:
+                configMapKeyRef:
+                  name: orthanc-app
+                  key: db.addr
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: orthanc-app
+                  key: db.port
+          volumeMounts:
+          - name: app-cm-vol
+            mountPath: "/run/secrets/orthanc.json"
+            subPath: "orthanc.json"
+            readOnly: true
+          - name: web-secret-vol
+            mountPath: "/run/secrets/web-tls.crt"
+            subPath: "tls.crt"
+            readOnly: true
+          - name: web-secret-vol
+            mountPath: "/run/secrets/web-tls.key"
+            subPath: "tls.key"
+            readOnly: true
+          - name: dcm-secret-vol
+            mountPath: "/run/secrets/dcm-tls.crt"
+            subPath: "tls.crt"
+            readOnly: true
+          - name: dcm-secret-vol
+            mountPath: "/run/secrets/dcm-tls.key"
+            subPath: "tls.key"
+            readOnly: true
+          lifecycle:
+            postStart:
+              exec:
+                command: ['/bin/sh','-c',' cat /run/secrets/web-tls.key /run/secrets/web-tls.crt > /run/secrets/web-tls.pem']
+          #livenessProbe:
+          #  httpGet:
+          #    path: /
+          #    port: http
           readinessProbe:
             httpGet:
-              path: /
-              port: http
+              path: /app/explorer.html
+              port: https
+              scheme: HTTPS
+              httpHeaders:
+                - name: Authorization
+                  value: Basic b3J0aGFuYzpvcnRoYW5j
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            successThreshold: 1
+            timeoutSeconds: 2
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+      - name: app-cm-vol
+        configMap:
+          name: orthanc-app
+          defaultMode: 0755
+      - name: web-secret-vol
+        secret:
+          secretName: web.orthweb.com
+          defaultMode: 0755
+      - name: dcm-secret-vol
+        secret:
+          secretName: dcm.orthweb.com
+          defaultMode: 0755
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

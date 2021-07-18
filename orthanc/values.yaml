@@ -116,5 +116,5 @@ postgresql-ha:
       certificatesSecret: db.orthweb.com 
       certFilename: tls.crt
       certKeyFilename: tls.key
-      certCAFilename: ca.crt
+      #certCAFilename: ca.crt # configuring this will require client to precent its cert for verification.
 
