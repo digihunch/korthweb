@@ -119,3 +119,18 @@ postgresql-ha:
       certKeyFilename: tls.key
       #certCAFilename: ca.crt # configuring this will require client to precent its cert for verification.
 
+#elasticsearch:
+#  enabled: true
+#  antiAffinity: "soft"
+#  esJavaOpts: "-Xmx128m -Xms128m"
+#  resources:
+#    requests:
+#      cpu: "100m"
+#      memory: "512M"
+#    limits:
+#      cpu: "100m"
+#      memory: "512M"
+logging:
+  enabled: true
+  kibana:
+    replicas: 2
