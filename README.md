@@ -30,5 +30,5 @@ helm install orthweb orthanc
 ```
 To uninstall (and remove persistent volumes for database) 
 ```sh
-helm uninstall orthweb && kubectl delete pvc -l app.kubernetes.io/component=postgresql
+helm uninstall orthweb && kubectl delete pvc -l app.kubernetes.io/component=postgresql && kubectl delete pvc -l app=elasticsearch-master
 ```
