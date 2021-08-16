@@ -31,20 +31,20 @@ dependencies:
     #alias: database # note: alias here will cause changes in service name. many other configuration depends on the service name
     tags:
     - orthanc-database
-  - condition: logging.enabled
-    name: elasticsearch
-    repository: https://helm.elastic.co
-    version: 7.14.x
-    alias: logging-elastic
-    tags:
-    - orthanc-logging
-  - condition: logging.enabled
-    name: kibana
-    repository: https://helm.elastic.co
-    version: 7.14.x
-    alias: logging-kibana
-    tags:
-    - orthanc-logging
+#  - condition: logging.enabled
+#    name: elasticsearch
+#    repository: https://helm.elastic.co
+#    version: 7.14.x
+#    alias: logging-elastic
+#    tags:
+#    - orthanc-logging
+#  - condition: logging.enabled
+#    name: kibana
+#    repository: https://helm.elastic.co
+#    version: 7.14.x
+#    alias: logging-kibana
+#    tags:
+#    - orthanc-logging
     #import-values:
     #  - child: . 
     #    parent: testkibana

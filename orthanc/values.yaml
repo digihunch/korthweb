@@ -130,19 +130,19 @@ postgresql-ha:
 #    limits:
 #      cpu: "100m"
 #      memory: "512M"
-logging:
-  enabled: true
-# the followings should be moved to under logging once this is implemented: https://github.com/helm/helm/issues/9817 
-logging-kibana:
-  replicas: 2
-logging-elastic:
-  replicas: 3
-  antiAffinity: "soft"
-  esJavaOpts: "-Xmx128m -Xms128m"
-  resources:
-    requests:
-      cpu: "100m"
-      memory: "512M"
-    limits:
-      cpu: "1000m"
-      memory: "512M"
+#logging:
+#  enabled: true
+## the followings should be moved to under logging once this is implemented: https://github.com/helm/helm/issues/9817 
+#logging-kibana:
+#  replicas: 2
+#logging-elastic:
+#  replicas: 3
+#  antiAffinity: "soft"
+#  esJavaOpts: "-Xmx128m -Xms128m"
+#  resources:
+#    requests:
+#      cpu: "100m"
+#      memory: "512M"
+#    limits:
+#      cpu: "1000m"
+#      memory: "512M"
