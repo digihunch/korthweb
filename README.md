@@ -3,16 +3,16 @@ Korthweb is a web deployment of Orthanc on Kubernetes.
 
 ## Prerequisite
 We need a Kubernetes cluster. A few options to consider are:
-* A single-node cluster (e.g. docker-desktop, minikube)
-* Elastic Kubernetes Service cluster on AWS
-* Azure Kubernetes Service cluster on Azure
-* Google Kubernetes Engine on GCP
+* A single machine cluster (e.g. docker-desktop, minikube, kind)
+* EKS (Elastic Kubernetes Service) cluster on AWS
+* AKS (Azure Kubernetes Service) cluster on Azure
+* GKE (Google Kubernetes Engine) on GCP
 
-A [single-node cluster](https://docs.docker.com/desktop/kubernetes/#:~:text=To%20enable%20Kubernetes%20support%20and,them%20manually%20is%20not%20supported.) is fairly easy to configure. For clusters on the cloud platforms, refer to [this](https://github.com/digihunch/korthweb/blob/main/cluster/README.md) instruction in *cluster* directory. Once the cluster is created and can be connected from kubectl, you can download this project directory to start. 
+A K8s cluster on a single machine is easy to configure but there are some details to consider for choosing the right tool. On that, I wrote a blog [post](https://www.digihunch.com/2021/09/single-node-kubernetes-cluster-minikube/) but the takeaway is: use Minikube on Mac, and use Kind with Docker desktop on Windows 10 WSL2. For cloud platforms, refer to [this](https://github.com/digihunch/korthweb/blob/main/cluster/README.md) instruction in *cluster* directory. Once the cluster is created and can be connected from kubectl, you can download this project directory to start. 
 
-The deployment project consists of two methods of deployment:
+This repo consists of two methods of deployment:
 * **Automatic deployment** using the helm chart defined in *orthanc* directory. With a single command, the installation is completed hassle-free, including the creation of self-signed certificates for tls connections for database, web, and dicom. The installation behaviour is customizable by parameters. The rest of this instruction is based on automatic deployment.
-* **Manual deployment** using the YAML declarations to complete installation manually. This gives you full transparency in terms of what kubernetes objects are created, but involves more steps and requires better understanding of Kubernetes. For more details, refer to [this](https://github.com/digihunch/korthweb/tree/main/manual) instruction.
+* **Manual deployment** using the YAML declarations to complete installation manually. This involves manual steps and requires better understanding of Kubernetes to operate. For more details, refer to [this](https://github.com/digihunch/korthweb/tree/main/manual) instruction.
 
 ### Client-side tools
 We need these tools to complete installation. Some are pre-installed on cloud shell from each provider.
