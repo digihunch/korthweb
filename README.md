@@ -53,8 +53,10 @@ nslookup xyz.elb.us-east-1.amazonaws.com
 Jot down the IP address. Suppose we get 123.22.143.244
 
 3. Edit the host file of your client laptop, add the line below to the bottom of /etc/hosts
+```sh
 123.22.143.244 dicom.orthweb.com
 123.22.143.244 web.orthweb.com
+```
 with the steps above, we're making sure dicom.orthweb.com resolves to the correct public IP (effective on the testing client)
 
 4. Test the port from the test client
