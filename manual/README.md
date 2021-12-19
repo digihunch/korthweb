@@ -27,7 +27,8 @@ helm install postgres-ha bitnami/postgresql-ha \
      --set pgpool.tls.certificatesSecret=tls-orthweb \
      --set pgpool.tls.certFilename=tls.crt \
      --set pgpool.tls.certKeyFilename=tls.key \
-     --set postgresql.initdbScriptsCM=orthanc-dbinit
+     --set postgresql.initdbScriptsCM=orthanc-dbinit \
+     --set volumePermissions.enabled=true
 ```
 Monitor the service and deploy status until all Pods are up. It usually takes a couple minutes.
 ```sh
