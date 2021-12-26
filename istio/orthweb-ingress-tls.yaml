@@ -1,0 +1,86 @@
+## gateway and virtual service for web and dicom traffic
+
+## orthweb.digihunch.com should resolve to IP address of ingress gateway
+# kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+## test ingress gateway for web traffic using curl
+# curl -HHost:orthweb.digihunch.com -v -k -X GET https://orthweb.digihunch.com:443/app/explorer.html -u orthanc:orthanc --cacert ca.crt
+## test ingresss gateway for dicom traffic 
+# using dcm4che: 
+# keytool -import -alias orthweb -file ca.crt -storetype JKS -keystore client.truststore
+# ./storescu -c ORTHANC@orthweb.digihunch.com:11112 --tls12 --tls-aes --trust-store path/to/client.truststore --trust-store-pass Password123!
+# ./storescu 
+
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: web-gw
+  namespace: orthweb
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS  
+    hosts:
+    - "orthweb.digihunch.com"
+    tls:
+      mode: SIMPLE
+      credentialName: orthweb-cred # secret in the same namespace as the istio-ingressgateway resource
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: web-vs
+  namespace: orthweb
+spec:
+  hosts:
+  - "orthweb.digihunch.com"
+  gateways:
+  - web-gw
+  http:
+#  - match:
+#    - uri: 
+#        prefix: /app
+  - route:
+    - destination:
+        host: orthweb # service label 
+        port: 
+          number: 8042
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: dcm-gw
+  namespace: orthweb
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 11112 
+      name: dicom
+      protocol: TLS  
+    hosts:
+    - "orthweb.digihunch.com"
+    tls:
+      mode: SIMPLE
+      credentialName: orthweb-cred # secret in the same namespace as the istio-ingressgateway resource
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: dcm-vs
+  namespace: orthweb
+spec:
+  hosts:
+  - "orthweb.digihunch.com"
+  gateways:
+  - dcm-gw
+  tcp:
+  - route:
+    - destination:
+        host: orthweb # service label 
+        port: 
+          number: 4242
