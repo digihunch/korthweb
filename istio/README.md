@@ -1,31 +1,45 @@
 
-## Deploy Orthanc Manually with Istio
-Once K8s cluster is configured, we can start deploying Orthanc. The files required for manual deployment is located in k8s subdirectory.
+## (Manually) Deploy Orthanc with Istio Ingress
 
+This instruction is tested on Minikube but should work on any K8s cluster. It is based on Istio 1.12.1
+
+### Install Minikube and Istio
+```sh
+minikube start --memory=12288 --cpus=6 --kubernetes-version=v1.20.2 --nodes 3 --container-runtime=containerd --driver=hyperkit --disk-size=150g
+minikube addons enable metallb
+minikube addons configure metallb
+```
+Put in the IP address range for load balancer, for example: 192.168.64.16 - 192.168.64.23. Then install istio using istioctl with the overlay file.
+
+```sh
 istioctl install -f overlay.yaml -y --verify
+```
+The overlay file includes specifications required for this instruction, such as ports. The stdout may report "no Istio installation found" which is not a concern. The Ingress service is running on an IP address in the range specified above, which can be displayed with the following command:
+```sh
+kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+```
+To assist the testing in the rest of the instruction, we can add it to local host file (e.g. /etc/hosts for Mac and Linux), for example:
+```
+192.168.64.16 orthweb.digihunch.com
+```
+On this IP address, we will use port 443 for HTTPS traffic and 11112 for DICOM traffic over TLS.
 
-kubectl create -n istio-system secret generic orthweb-cred --from-file=tls.key=server.key --from-file=tls.crt=server.crt --from-file=ca.crt=ca.crt
-
-
-### Prepare Configuration
-If we don't already have key and certificates, let's generate key and certificate for CA, and use it to sign a certificate for our site.
+### Configure certificates
+Let's generate key and certificate for CA, and use it to sign a certificate for our site.
 ```sh
 openssl req -x509 -sha256 -newkey rsa:4906 -keyout ca.key -out ca.crt -days 356 -nodes -subj '/CN=Test Cert Authority'
 openssl req -new -newkey rsa:4096 -keyout server.key -out server.csr -nodes -subj '/CN=orthweb.digihunch.com'
 openssl x509 -req -sha256 -days 365 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt
+kubectl create -n istio-system secret generic orthweb-cred --from-file=tls.key=server.key --from-file=tls.crt=server.crt --from-file=ca.crt=ca.crt
 ```
-Then we can import configuration (including certificates, keys and application configurations) into Kubernetes cluster.
+The command above imports key, certificate and CA certificate into istio-system namespace for istio ingress Gateway to use. 
+
+### Deploy application
+We start with creating ConfigMaps, which creates the namespace orthweb and label it as requiring sidecar injection. Then we create the Secret needed for applicaiton to communicate with database. We use Helm to deploy the database and two YAML manifests for Deployment and Service to deploy the Orthanc application.
 ```sh
 kubectl apply -f configmap.yaml
 kubectl -n orthweb create secret tls tls-orthweb --cert=server.crt --key=server.key
-```
-### Deploy Database
-The install of database will require an initialization script (stored in ConfigMap orthanc-dbinit from the last step). Before doing that, we want to make sure helm knows where to pick up helm chart for Postgres installation, by adding repo URL:
-```sh
 helm repo add bitnami https://charts.bitnami.com/bitnami
-```
-Then we can initialize postgres database in HA, with custom options as below:
-```sh
 helm install postgres-ha bitnami/postgresql-ha \
      --create-namespace --namespace orthweb \
      --set pgpool.tls.enabled=true \
@@ -39,71 +53,32 @@ Monitor the service and deploy status until all Pods are up. It usually takes a 
 ```sh
 kubectl get all -n orthweb
 ```
-
-### Deploy Application
-The application deployment is done with a deployment object and a service object (load balancer type):
+It may take minutes before the PostgreSQL services coming up. Then we bring up application's Deployment and Service.
 ```sh
-kubectl apply -f web-deploy.yaml
-kubectl apply -f web-service.yaml
+kubectl apply -f orthweb-deploy.yaml
+kubectl apply -f orthweb-service.yaml
 ```
-The bottom command brings up a network load balancer, with 8042 (HTTPS) and 4242 (DICOM TLS) ports open. The web-svc status has loadBalancer field under status, which indicates the dns name of load balancer. The DNS name may take a couple minutes to become resolvable. The IP address can be added to local host file (e.g. /etc/hosts for Mac and Linux) like this:
+The manifests define a Kubernetes Service with ClusterIP type,  with 8042 (HTTP) and 4242 (DICOM) ports open. Neither ports are exposed outside of the cluster. We will later need Istio Ingress to expose the services outside of the cluster, as well as to terminate TLS for both HTTP and DICOM.
+```sh
+kubectl apply -f orthweb-ingress-tls.yaml
 ```
-3.232.159.192 orthweb.digihunch.com
-```
-The load balancer may take a couple minutes to come up.
+The command above configures istio ingress with TLS termination. 
+
 
 ### Validation
-we use curl and echoscu (installed as dcmtk brew package) to validate. Assuming the DNS resolution is working (either by editing /etc/hosts locally or, by actually adding an A record in DNS)
+
+we use curl to validate HTTPS traffic
 ```sh
-curl -k -X GET https://orthweb.digihunch.com:8042/app/explorer.html -I -u orthanc:orthanc
-echoscu -v orthweb.digihunch.com 4242 --anonymous-tls +cf ca.crt
-storescu -v -aec ORTHANC --anonymous-tls +cf ca.crt orthweb.digihunch.com 4242 ~/Downloads/CR.dcm
-```
-The stdout from DICOM C-Echo interaction looks like this:
-```
-I: Requesting Association
-I: Association Accepted (Max Send PDV: 16372)
-I: Sending Echo Request (MsgID 1)
-I: Received Echo Response (Success)
-I: Releasing Association
-```
-The stdout from DICOM C-Store interaction looks like this:
-```
-I: checking input files ...
-I: Requesting Association
-I: Association Accepted (Max Send PDV: 16372)
-I: Sending file: /Users/digihunch/Downloads/CR.dcm
-I: Converting transfer syntax: Little Endian Implicit -> Little Endian Implicit
-I: Sending Store Request (MsgID 1, CR)
-XMIT: ....................................................................................................................................................................................................................................................................................................................................................................................
-I: Received Store Response (Success)
-I: Releasing Association
-```
+curl -HHost:orthweb.digihunch.com -v -k -X GET https://orthweb.digihunch.com:443/app/explorer.html -u orthanc:orthanc --cacert ca.crt
 
-### Clean up
-If this deployment is for testing only, it is important to clean up environment by deleting the cluster at the end. The steps to delete cluster are under the section Kubernetes Cluster above. The deletion may take a couple minutes.
-
-
-### Troubleshooting Tips
-If Pod does not come to Running status, and is stuck with CreateContainerConfigError, check Pod status details with -o yaml. Consider configuration error such as passing secret data to env variable.
+```
+Then we use dcm4chee to validate DICOM traffic. Before running C-ECHO, we first import the CA certificate to a trust store, with a password, say Password123!
 ```sh
-kubectl -n orthweb get po web-dpl-6ddb587885-xxxx -o yaml
+keytool -import -alias orthweb -file ca.crt -storetype JKS -keystore client.truststore
+storescu -c ORTHANC@orthweb.digihunch.com:11112 --tls12 --tls-aes --trust-store path/to/client.truststore --trust-store-pass Password123!
 ```
-If Pod continues to fail, check postgres connectivity from within the Pod. You might need to comment out the args so you can ssh into the Pod and run the followings:
+We then use storescu (without a DCM file specified) as a C-ECHO SCU. If it returns success, we can C-STORE a DCM file:
 ```sh
-export PGPASSWORD=$DB_PASSWORD && apt update && apt install postgresql postgresql-contrib
-psql --host=$DB_ADDR --port $DB_PORT --username=$DB_USERNAME sslmode=require
+storescu -c ORTHANC@orthweb.digihunch.com:11112 TEST.DCM --tls12 --tls-aes --trust-store path/to/client.truststore --trust-store-pass Password123!
 ```
-For a manual test from kubectl client, use port forwarding:
-```sh
-kubectl -n orthweb port-forward service/web-svc 8042:8042
-curl -k -X GET https://0.0.0.0:8042/app/explorer.html -I -u orthanc:orthanc
-```
-
-
-### Notes
-1. How container [args](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/) work.
-
-2. How http authentication works in [readiness probe](https://stackoverflow.com/questions/33484942/how-to-use-basic-authentication-in-a-http-liveness-probe-in-kubernetes).
-
-3. Postgres Container Documentation (postgresql.initdbScriptsCM takes files with sql extension, while pgpool.initdbScriptsCM doesn't, according to [this](https://artifacthub.io/packages/helm/bitnami/postgresql-ha)
+Once the DICOM file has been sent, it should be viewable from browser.
