@@ -72,7 +72,7 @@ we use curl to validate HTTPS traffic
 curl -HHost:orthweb.digihunch.com -v -k -X GET https://orthweb.digihunch.com:443/app/explorer.html -u orthanc:orthanc --cacert ca.crt
 
 ```
-Then we use dcm4chee to validate DICOM traffic. Before running C-ECHO, we first import the CA certificate to a trust store, with a password, say Password123!
+Then we use [dcm4chee](https://github.com/dcm4che/dcm4che/releases) to validate DICOM traffic. Before running C-ECHO, we first import the CA certificate to a trust store, with a password, say Password123!
 ```sh
 keytool -import -alias orthweb -file ca.crt -storetype JKS -keystore client.truststore
 storescu -c ORTHANC@orthweb.digihunch.com:11112 --tls12 --tls-aes --trust-store path/to/client.truststore --trust-store-pass Password123!
@@ -81,4 +81,4 @@ We then use storescu (without a DCM file specified) as a C-ECHO SCU. If it retur
 ```sh
 storescu -c ORTHANC@orthweb.digihunch.com:11112 TEST.DCM --tls12 --tls-aes --trust-store path/to/client.truststore --trust-store-pass Password123!
 ```
-Once the DICOM file has been sent, it should be viewable from browser.
+Once the DICOM file has been sent, and the C-STORE SCP returns success, the image should be viewable from browser. Any [sample](http://www.rubomedical.com/dicom_files/) DICOM image should work for this test case. 
