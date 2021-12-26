@@ -52,6 +52,18 @@ spec:
           mountPath: "/run/secrets/orthanc.json"
           subPath: "orthanc.json"
           readOnly: true
+#        - name: secvol
+#          mountPath: "/run/secrets/tls.crt"
+#          subPath: "tls.crt"
+#          readOnly: true
+#        - name: secvol
+#          mountPath: "/run/secrets/tls.key"
+#          subPath: "tls.key"
+#          readOnly: true
+#        lifecycle:
+#          postStart:
+#            exec:
+#              command: ['/bin/sh','-c',' cat /run/secrets/tls.key /run/secrets/tls.crt > /run/secrets/tls.pem']
         readinessProbe:
           failureThreshold: 3
           httpGet:
