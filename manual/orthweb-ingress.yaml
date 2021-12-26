@@ -1,12 +1,12 @@
 ## gateway and virtual service for web and dicom traffic
 
-## orthweb.digihunch.com should resolve to IP address of ingress gateway
+## web.orthweb.com and dicom.orthweb.com should resolve to IP address of ingress gateway
 # kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 ## test ingress gateway for web traffic using curl
-# curl -v -X GET http://orthweb.digihunch.com:80/app/explorer.html -u orthanc:orthanc
+# curl -v -X GET http://web.orthweb.com:80/app/explorer.html -u orthanc:orthanc
 ## test ingresss gateway for dicom traffic 
-# using dcmtk: echoscu -ll debug -aec ORTHANC orthweb.digihunch.com 11112 
-# using dcm4che: storescu -c ORTHANC@orthweb.digihunch.com:11112
+# using dcmtk: echoscu -ll debug -aec ORTHANC dicom.orthweb.com 11112 
+# using dcm4che: storescu -c ORTHANC@dicom.orthweb.com:11112
 
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
@@ -22,7 +22,7 @@ spec:
       name: http
       protocol: HTTP  
     hosts:
-    - "orthweb.digihunch.com"
+    - "web.orthweb.com"
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -31,7 +31,7 @@ metadata:
   namespace: orthweb
 spec:
   hosts:
-  - "orthweb.digihunch.com"
+  - "web.orthweb.com"
   gateways:
   - web-gw
   http:
@@ -58,7 +58,7 @@ spec:
       name: dicom
       protocol: TCP  
     hosts:
-    - "orthweb.digihunch.com"
+    - "dicom.orthweb.com"
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -67,7 +67,7 @@ metadata:
   namespace: orthweb
 spec:
   hosts:
-  - "orthweb.digihunch.com"
+  - "dicom.orthweb.com"
   gateways:
   - dcm-gw
   tcp:

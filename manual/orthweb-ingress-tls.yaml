@@ -1,13 +1,13 @@
 ## gateway and virtual service for web and dicom traffic
 
-## orthweb.digihunch.com should resolve to IP address of ingress gateway
+## web.orthweb.com and dicom.orthweb.com should resolve to IP address of ingress gateway
 # kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 ## test ingress gateway for web traffic using curl
-# curl -HHost:orthweb.digihunch.com -v -k -X GET https://orthweb.digihunch.com:443/app/explorer.html -u orthanc:orthanc --cacert ca.crt
+# curl -HHost:web.orthweb.com -v -k -X GET https://web.orthweb.com:443/app/explorer.html -u orthanc:orthanc --cacert ca.crt
 ## test ingresss gateway for dicom traffic 
 # using dcm4che: 
 # keytool -import -alias orthweb -file ca.crt -storetype JKS -keystore client.truststore
-# ./storescu -c ORTHANC@orthweb.digihunch.com:11112 --tls12 --tls-aes --trust-store path/to/client.truststore --trust-store-pass Password123!
+# ./storescu -c ORTHANC@dicom.orthweb.com:11112 --tls12 --tls-aes --trust-store path/to/client.truststore --trust-store-pass Password123!
 
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
@@ -23,7 +23,7 @@ spec:
       name: https
       protocol: HTTPS  
     hosts:
-    - "orthweb.digihunch.com"
+    - "web.orthweb.com"
     tls:
       mode: SIMPLE
       credentialName: orthweb-cred # secret in the same namespace as the istio-ingressgateway resource
@@ -35,7 +35,7 @@ metadata:
   namespace: orthweb
 spec:
   hosts:
-  - "orthweb.digihunch.com"
+  - "web.orthweb.com"
   gateways:
   - web-gw
   http:
@@ -62,7 +62,7 @@ spec:
       name: dicom
       protocol: TLS  
     hosts:
-    - "orthweb.digihunch.com"
+    - "dicom.orthweb.com"
     tls:
       mode: SIMPLE
       credentialName: orthweb-cred # secret in the same namespace as the istio-ingressgateway resource
@@ -74,7 +74,7 @@ metadata:
   namespace: orthweb
 spec:
   hosts:
-  - "orthweb.digihunch.com"
+  - "dicom.orthweb.com"
   gateways:
   - dcm-gw
   tcp:
