@@ -59,6 +59,7 @@ helm install postgres-ha bitnami/postgresql-ha \
      --set postgresql.initdbScriptsCM=orthanc-dbinit \
      --set volumePermissions.enabled=true
 ```
+Note that we provide SQL script (stored in orthanc-dbinit entry) to postgresql.initdbScriptsCM instead of pgpool.initdbScriptsCM because the altter doesn't take files with SQL extention, according to the [documentation](https://artifacthub.io/packages/helm/bitnami/postgresql-ha) of PostgreSQL helm chart.
 Monitor the service and deploy status until all Pods are up. It usually takes a couple minutes.
 ```sh
 kubectl get all -n orthweb
@@ -68,7 +69,7 @@ It may take minutes before the PostgreSQL services coming up. Then we bring up a
 kubectl apply -f orthweb-deploy.yaml
 kubectl apply -f orthweb-service.yaml
 ```
-The manifests define a Kubernetes Service with ClusterIP type,  with 8042 (HTTP) and 4242 (DICOM) ports open. Neither ports are exposed outside of the cluster. We will later need Istio Ingress to expose the services outside of the cluster, as well as to terminate TLS for both HTTP and DICOM.
+The first manifest defines Pods in a Deployment. The Pods contains [readiness probe](https://stackoverflow.com/questions/33484942/how-to-use-basic-authentication-in-a-http-liveness-probe-in-kubernetes) for HTTP health check. The second manifest defines a Kubernetes Service with ClusterIP type,  with 8042 (HTTP) and 4242 (DICOM) ports open. Neither ports are exposed outside of the cluster. We will later need Istio Ingress to expose the services outside of the cluster, as well as to terminate TLS for both HTTP and DICOM.
 ```sh
 kubectl apply -f orthweb-ingress-tls.yaml
 ```
@@ -92,3 +93,16 @@ We then use storescu (without a DCM file specified) as a C-ECHO SCU. If it retur
 storescu -c ORTHANC@dicom.orthweb.com:11112 TEST.DCM --tls12 --tls-aes --trust-store path/to/client.truststore --trust-store-pass Password123!
 ```
 Once the DICOM file has been sent, and the C-STORE SCP returns success, the image should be viewable from browser. Any [sample](http://www.rubomedical.com/dicom_files/) DICOM image should work for this test case. 
+
+To validate database service, SSH to a workload pod (with some [args](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/) commented out) or a sleeper pod:
+```sh
+export PGPASSWORD=$DB_PASSWORD && apt update && apt install postgresql postgresql-contrib
+psql --host=$DB_ADDR --port $DB_PORT --username=$DB_USERNAME sslmode=require
+```
+
+To test Kubernetes Service without Ingress, use port forwarding. 
+```sh
+kubectl -n orthweb port-forward service/web-svc 8042:8042
+curl -k -X GET https://0.0.0.0:8042/app/explorer.html -I -u orthanc:orthanc
+```
+
