@@ -1,0 +1,49 @@
+apiVersion: install.istio.io/v1alpha2
+kind: IstioControlPlane
+metadata:
+  namespace: istio-operator
+  name: custom-istiocontrolplane
+spec:
+  profile: default
+  values:
+    meshConfig:
+      accessLogFile: /dev/stdout
+      # enableAutoMtls: true
+      outboundTrafficPolicy:
+        mode: "REGISTRY_ONLY"
+    gateways:
+      istio-ingressgateway:
+        enabled: true
+        autoscaleEnabled: true 
+        autoscaleMin: 1
+        autoscaleMax: 5
+        serviceAnnotations:
+          service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+          service.beta.kubernetes.io/azure-load-balancer-internal-subnet: "suitable-porpoise-lb-subnet"
+        ports:
+        - name: status-port
+          nodePort: 30921
+          port: 15021
+          protocol: TCP
+          targetPort: 15020
+        - name: http2
+          nodePort: 30766
+          port: 80
+          protocol: TCP
+          targetPort: 8080
+        - name: https
+          nodePort: 30850
+          port: 443
+          protocol: TCP
+          targetPort: 8443
+        - name: dicom
+          nodePort: 30476
+          port: 11112
+          protocol: TCP
+          targetPort: 4242
+      istio-egressgateway:
+        enabled: true
+        autoscaleEnabled: true
+    global:
+      defaultNodeSelector:
+        beta.kubernetes.io/os: linux

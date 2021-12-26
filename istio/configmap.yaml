@@ -2,8 +2,8 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: orthweb
-#  labels:
-#    istio-injection: enabled
+  labels:
+    istio-injection: enabled
 ---
 kind: ConfigMap
 apiVersion: v1

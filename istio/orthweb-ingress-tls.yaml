@@ -8,7 +8,6 @@
 # using dcm4che: 
 # keytool -import -alias orthweb -file ca.crt -storetype JKS -keystore client.truststore
 # ./storescu -c ORTHANC@orthweb.digihunch.com:11112 --tls12 --tls-aes --trust-store path/to/client.truststore --trust-store-pass Password123!
-# ./storescu 
 
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
