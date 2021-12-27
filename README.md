@@ -1,22 +1,26 @@
 # Korthweb - Orthanc deployment on Kubernetes
-Korthweb is a web deployment of Orthanc on Kubernetes. 
+Korthweb is an open-source project to deploy [Orthanc](https://www.orthanc-server.com/) on Kubernetes platform. Orthanc is an open-source application to ingest, store, display and distribute medical images. Korthweb uses Helm for automation, and Istio for ingress and observability. Korthweb is a sister project of [Orthweb](https://github.com/digihunch/orthweb), an deployment automation project for Orthanc in AWS. 
 
 ## Prerequisite
-We need a Kubernetes cluster. A few options to consider are:
-* A single machine cluster (e.g. docker-desktop, minikube, kind)
-* EKS (Elastic Kubernetes Service) cluster on AWS
-* AKS (Azure Kubernetes Service) cluster on Azure
-* GKE (Google Kubernetes Engine) on GCP
+We need a Kubernetes cluster as the platform to run Helm Chart. Depending on your use case, consider the following options:
+| Use case | Description | How to create |
+|--|--|--|
+| Playground | Multi-node cluster on single machine to start instantly for POC.| Use Minikube on MacOS or kind on WSL2. Check out my [post](https://www.digihunch.com/2021/09/single-node-kubernetes-cluster-minikube/) for the reason for this choice. |
+| Demo | Multi-node cluster on public cloud platform such as EKS on AWS, AKS on Azure or GKE on GCP. | CLI tools by the cloud vendor can typically handle this level of complexity. Working instructions are provided for reference in the [cluster](https://github.com/digihunch/korthweb/blob/main/cluster/README.md)  directory of this project. |
+| Professional | Clusters on private networks in public cloud or private platform for test and production environments.  | The cluster infrastructure should be managed as IaC (Infrastructure as Code) specific to your environment. Reference implementation provided in [CloudKube](https://github.com/digihunch/cloudkube) project. Contact [DigiHunch](https://www.digihunch.com/contact/) for professional service to customize the cluster.|
 
-A K8s cluster on a single machine is easy to configure but there are some details to consider for choosing the right tool. On that, I wrote a blog [post](https://www.digihunch.com/2021/09/single-node-kubernetes-cluster-minikube/) but the takeaway is: use Minikube on Mac, and use Kind with Docker desktop on Windows 10 WSL2. For cloud platforms, refer to [this](https://github.com/digihunch/korthweb/blob/main/cluster/README.md) instruction in *cluster* directory. Once the cluster is created and can be connected from kubectl, you can download this project directory to start. 
+## Toolings
 
-This repo consists of two methods of deployment:
-* **Automatic deployment** using the helm chart defined in *orthanc* directory. With a single command, the installation is completed hassle-free, including the creation of self-signed certificates for tls connections for database, web, and dicom. The installation behaviour is customizable by parameters. The rest of this instruction is based on automatic deployment.
-* **Manual deployment** using the YAML declarations to complete installation manually. This involves manual steps and requires better understanding of Kubernetes to operate. For more details, refer to [this](https://github.com/digihunch/korthweb/tree/main/manual) instruction.
+### Helm Chart
+The purpose of this repo is to provide a Helm Chart to deploy Orthanc on Kubernetes with a single command, including the creation of self-signed certificates. The Helm Chart is defined in the *[orthanc](https://github.com/digihunch/korthweb/tree/main/orthanc)* directory and is customizable with parameters. The rest of this instruction is based on automatic deployment.
+The directory *[manual](https://github.com/digihunch/korthweb/tree/main/manual)* is also kept in this repository to help userstand the deployment and guide development of Helm Chart.
 
-### Client-side tools
-We need these tools to complete installation. Some are pre-installed on cloud shell from each provider.
-* [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl): interact with the Kubernetes cluster. Once we provision a Kubernetes cluster, we can use cloud provider's CLI tool to update kubectl context. However, if is helpful to know how to [switch context](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/) for kubectl manually.
+### Istio Service Mesh
+Applications running as [microservices](https://www.digihunch.com/2021/11/from-microservice-to-service-mesh/) requires many common features for observability (e.g. tracing), security (e.g. mTLS), traffic management (e.g. ingress and egress, traffic splitting), and resiliency (circuit breaking, retry/timeout). Service Mesh commodifies these features into a layer between Kubernetes platform and the workload. Istio is a popular choice for Service Mesh. 
+
+### CLI tools
+We need these tools to complete installation.
+* [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl): connect to API server to manage the Kubernetes cluster. With multiple clusters, you need to [switch context](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/).
 * [helm](https://helm.sh/docs/intro/install/): helm is package manager for Kubernetes.
 
 ## Deploy Orthanc using helm
