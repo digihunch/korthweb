@@ -1,12 +1,8 @@
 {  
   "Name" : "Orthanc Configuration",
   "RemoteAccessAllowed" : true,
-  "SslEnabled" : true,
-  "SslCertificate" : "web-tls.pem",
-  "DicomTlsEnabled" : true,
-  "DicomTlsCertificate" : "/run/secrets/dcm-tls.crt",
-  "DicomTlsPrivateKey" : "/run/secrets/dcm-tls.key",
-  "DicomTlsTrustedCertificates" : "/run/secrets/dcm-tls.crt",
+  "SslEnabled" : false,
+  "DicomTlsEnabled" : false,
   "DicomTlsRemoteCertificateRequired" : false,
   "PostgreSQL" : {
     "EnableIndex" : true,

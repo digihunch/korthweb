@@ -26,11 +26,11 @@ helm dependency update orthanc
 ```
 From orthweb directory, run:
 ```sh
-helm install orthweb orthanc
+helm install orthweb orthanc --create-namespace --namespace orthweb 
 ```
 To uninstall (and remove persistent volumes for database) 
 ```sh
-helm uninstall orthweb && kubectl delete pvc -l app.kubernetes.io/component=postgresql && kubectl delete pvc -l app=elasticsearch-master
+helm -n orthweb uninstall orthweb && kubectl -n orthweb delete pvc -l app.kubernetes.io/component=postgresql 
 ```
 ## Test the site after automatic deployment
 The helm chart by default does a lot of automation, including the creation of certificates for the following three domain name. The helm chart also creates a public facing load balancer. we need to collect some information before validation.

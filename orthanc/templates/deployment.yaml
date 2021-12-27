@@ -51,11 +51,11 @@ spec:
           args: ["/run/secrets/"]
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: https
-              containerPort: {{ .Values.service.httpsPort }}
+            - name: http
+              containerPort: {{ .Values.service.httpPort }}
               protocol: TCP
-            - name: dcmtls
-              containerPort: {{ .Values.service.dcmtlsPort }} 
+            - name: dicom
+              containerPort: {{ .Values.service.dicomPort }} 
               protocol: TCP
           env:
             - name: DB_PASSWORD
@@ -83,31 +83,31 @@ spec:
             mountPath: "/run/secrets/orthanc.json"
             subPath: "orthanc.json"
             readOnly: true
-          - name: web-secret-vol
-            mountPath: "/run/secrets/web-tls.crt"
-            subPath: "tls.crt"
-            readOnly: true
-          - name: web-secret-vol
-            mountPath: "/run/secrets/web-tls.key"
-            subPath: "tls.key"
-            readOnly: true
-          - name: dcm-secret-vol
-            mountPath: "/run/secrets/dcm-tls.crt"
-            subPath: "tls.crt"
-            readOnly: true
-          - name: dcm-secret-vol
-            mountPath: "/run/secrets/dcm-tls.key"
-            subPath: "tls.key"
-            readOnly: true
-          lifecycle:
-            postStart:
-              exec:
-                command: ['/bin/sh','-c',' cat /run/secrets/web-tls.key /run/secrets/web-tls.crt > /run/secrets/web-tls.pem']
+#          - name: web-secret-vol
+#            mountPath: "/run/secrets/web-tls.crt"
+#            subPath: "tls.crt"
+#            readOnly: true
+#          - name: web-secret-vol
+#            mountPath: "/run/secrets/web-tls.key"
+#            subPath: "tls.key"
+#            readOnly: true
+#          - name: dcm-secret-vol
+#            mountPath: "/run/secrets/dcm-tls.crt"
+#            subPath: "tls.crt"
+#            readOnly: true
+#          - name: dcm-secret-vol
+#            mountPath: "/run/secrets/dcm-tls.key"
+#            subPath: "tls.key"
+#            readOnly: true
+#          lifecycle:
+#            postStart:
+#              exec:
+#                command: ['/bin/sh','-c',' cat /run/secrets/web-tls.key /run/secrets/web-tls.crt > /run/secrets/web-tls.pem']
           readinessProbe:
             httpGet:
               path: /app/explorer.html
-              port: https
-              scheme: HTTPS
+              port: http
+              scheme: HTTP
               httpHeaders:
                 - name: Authorization
                   value: Basic {{ "orthanc:orthanc" | b64enc }}  
@@ -123,14 +123,14 @@ spec:
         configMap:
           name: orthanc-app
           defaultMode: 0755
-      - name: web-secret-vol
-        secret:
-          secretName: web.orthweb.com
-          defaultMode: 0755
-      - name: dcm-secret-vol
-        secret:
-          secretName: dcm.orthweb.com
-          defaultMode: 0755
+#      - name: web-secret-vol
+#        secret:
+#          secretName: web.orthweb.com
+#          defaultMode: 0755
+#      - name: dcm-secret-vol
+#        secret:
+#          secretName: dcm.orthweb.com
+#          defaultMode: 0755
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

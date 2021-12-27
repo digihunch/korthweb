@@ -8,7 +8,7 @@ image:
   repository: jodogne/orthanc-plugins 
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.9.5"
+  tag: "1.9.7"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -37,9 +37,9 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: LoadBalancer 
-  httpsPort: 8042
-  dcmtlsPort: 4242 
+  type: ClusterIP 
+  httpPort: 8042
+  dicomPort: 4242 
 
 ingress:
   enabled: false
@@ -109,6 +109,8 @@ https:
 
 postgresql-ha:
   enabled: true
+  volumePermissions:
+    enabled: true
   postgresql:
     initdbScriptsCM: orthanc-dbinit
   pgpool:
@@ -118,31 +120,3 @@ postgresql-ha:
       certFilename: tls.crt
       certKeyFilename: tls.key
       #certCAFilename: ca.crt # configuring this will require client to precent its cert for verification.
-
-#elasticsearch:
-#  enabled: true
-#  antiAffinity: "soft"
-#  esJavaOpts: "-Xmx128m -Xms128m"
-#  resources:
-#    requests:
-#      cpu: "100m"
-#      memory: "512M"
-#    limits:
-#      cpu: "100m"
-#      memory: "512M"
-#logging:
-#  enabled: true
-## the followings should be moved to under logging once this is implemented: https://github.com/helm/helm/issues/9817 
-#logging-kibana:
-#  replicas: 2
-#logging-elastic:
-#  replicas: 3
-#  antiAffinity: "soft"
-#  esJavaOpts: "-Xmx128m -Xms128m"
-#  resources:
-#    requests:
-#      cpu: "100m"
-#      memory: "512M"
-#    limits:
-#      cpu: "1000m"
-#      memory: "512M"
