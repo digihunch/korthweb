@@ -2,7 +2,7 @@
 Korthweb is an open-source project to deploy [Orthanc](https://www.orthanc-server.com/) on Kubernetes platform. Orthanc is an open-source application to ingest, store, display and distribute medical images. Korthweb uses Helm for automation, and Istio for ingress and observability. Korthweb is a sister project of [Orthweb](https://github.com/digihunch/orthweb), an deployment automation project for Orthanc in AWS. 
 
 ## Prerequisite
-We need a Kubernetes cluster as the platform to run Helm Chart. Depending on your use case, consider the following options:
+We need a Kubernetes cluster as the platform to run Helm Chart. Depending on your use case, consider the following options for Kubernetes cluster:
 | Use case | Description | How to create |
 |--|--|--|
 | Playground | Multi-node cluster on single machine to start instantly for POC.| Use Minikube on MacOS or kind on WSL2. Check out my [post](https://www.digihunch.com/2021/09/single-node-kubernetes-cluster-minikube/) for the reason for this choice. |
