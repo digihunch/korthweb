@@ -19,10 +19,7 @@ Put in the IP address range for load balancer, for example: 192.168.64.16 - 192.
 ```sh
 istioctl install -f overlay.yaml -y --verify
 ```
-The overlay file includes specifications required for this instruction, such as ports. The stdout may report "no Istio installation found" which is not a concern. The Ingress service is running on an IP address in the range specified above, which can be displayed with the following command:
-```sh
-kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-```
+The overlay file includes specifications required for this instruction, such as ports. The stdout may report "no Istio installation found" which is not a concern. 
 
 #### Approach 2. Install Istio using Helm Chart
 There are a number of Helm [Charts](https://artifacthub.io/packages/search?org=istio) for Istio components and they can be added to repo list:
@@ -36,18 +33,16 @@ Then we install components in the following sequence:
 helm install istio-base istio/base --create-namespace --namespace istio-system
 # use istiod chart to install istiod
 helm install istiod istio/istiod -f istiod-values.yaml --namespace istio-system --wait
-kubectl create namespace istio-gateway
-kubectl label namespace istio-gateway istio-injection=enabled
 # use gateway chart to install ingress gateway
-helm -n istio-gateway install istio-ingress istio/gateway -f ingress-gateway-values.yaml
+helm -n istio-system install istio-ingress istio/gateway -f ingress-gateway-values.yaml
 # use gateway chart to install egress gateway
-helm -n istio-gateway install istio-egress istio/gateway -f egress-gateway-values.yaml
-```
-In this approach, the istio gateway services are installed in a separate namespace called istio-gateway. Confirm the istio-ingress gateway running with the following command:
-```sh
-kubectl -n istio-gateway get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+helm -n istio-system install istio-egress istio/gateway -f egress-gateway-values.yaml
 ```
 #### Configure DNS and addons
+The Ingress service is running on an IP address in the range specified above, which can be displayed with the following command:
+```sh
+kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+```
 To assist the testing in the rest of the instruction, we can add it to local host file (e.g. /etc/hosts for Mac and Linux), for example:
 ```
 192.168.64.16 web.orthweb.com
@@ -71,13 +66,9 @@ openssl req -x509 -sha256 -newkey rsa:4906 -keyout ca.key -out ca.crt -days 356 
 openssl req -new -newkey rsa:4096 -keyout server.key -out server.csr -nodes -subj '/CN=*.orthweb.com'
 openssl x509 -req -sha256 -days 365 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt
 ```
-Then we import key, certificate and CA certificate into secrets for istio ingress Gateway to consume. If you installed Istio using overlay files, and the gateway is created in *istio-system* namespace, then create Secret in the same namespace:
+Then we import key, certificate and CA certificate into secrets for istio ingress Gateway to consume. The secret and the gateway service must be in the same namespace. Create Secret with this command: 
 ```sh
 kubectl create -n istio-system secret generic orthweb-cred --from-file=tls.key=server.key --from-file=tls.crt=server.crt --from-file=ca.crt=ca.crt
-```
-If you install Istio using Helm charts, and the gateway is created in *istio-gateway* namespace, then create Secret in the same namespace:
-```sh
-kubectl create -n istio-gateway secret generic orthweb-cred --from-file=tls.key=server.key --from-file=tls.crt=server.crt --from-file=ca.crt=ca.crt
 ```
 
 ### Deploy application

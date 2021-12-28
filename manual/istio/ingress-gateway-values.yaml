@@ -18,12 +18,12 @@ service:
     port: 11112
     protocol: TCP
     targetPort: 4242
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    service.beta.kubernetes.io/azure-load-balancer-internal-subnet: "suitable-porpoise-lb-subnet"
 labels:
   app: istio-ingressgateway
   istio: ingressgateway
-annotations:
-  service.beta.kubernetes.io/azure-load-balancer-internal: "true"
-  service.beta.kubernetes.io/azure-load-balancer-internal-subnet: "suitable-porpoise-lb-subnet"
 autoscaling:
   enabled: true
   minReplicas: 1
