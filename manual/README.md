@@ -30,9 +30,9 @@ helm repo update
 Then we install components in the following sequence:
 ```sh
 # use base chart to install crds, then verify with "kubectl get crds"
-helm install istio-base istio/base --create-namespace --namespace istio-system
+helm install -n istio-system istio-base istio/base --create-namespace
 # use istiod chart to install istiod
-helm install istiod istio/istiod -f istiod-values.yaml --namespace istio-system --wait
+helm -n istio-system install istiod istio/istiod -f istiod-values.yaml --wait
 # use gateway chart to install ingress gateway
 helm -n istio-system install istio-ingress istio/gateway -f ingress-gateway-values.yaml
 # use gateway chart to install egress gateway
@@ -74,7 +74,7 @@ kubectl create -n istio-system secret generic orthweb-cred --from-file=tls.key=s
 ### Deploy application
 We start with creating ConfigMaps, which creates the namespace orthweb and label it as requiring sidecar injection. Then we create the Secret needed for applicaiton to communicate with database. We use Helm to deploy the database and two YAML manifests for Deployment and Service to deploy the Orthanc application.
 ```sh
-kubectl apply -f configmap.yaml
+kubectl apply -f orthweb-cm.yaml
 kubectl -n orthweb create secret tls tls-orthweb --cert=server.crt --key=server.key
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install postgres-ha bitnami/postgresql-ha \
@@ -93,8 +93,7 @@ kubectl get all -n orthweb
 ```
 It may take minutes before the PostgreSQL services coming up. Then we bring up application's Deployment and Service.
 ```sh
-kubectl apply -f orthweb-deploy.yaml
-kubectl apply -f orthweb-service.yaml
+kubectl apply -f orthweb-workload.yaml
 ```
 The first manifest defines Pods in a Deployment. The Pods contains [readiness probe](https://stackoverflow.com/questions/33484942/how-to-use-basic-authentication-in-a-http-liveness-probe-in-kubernetes) for HTTP health check. The second manifest defines a Kubernetes Service with ClusterIP type,  with 8042 (HTTP) and 4242 (DICOM) ports open. Neither ports are exposed outside of the cluster. We will later need Istio Ingress to expose the services outside of the cluster, as well as to terminate TLS for both HTTP and DICOM.
 ```sh

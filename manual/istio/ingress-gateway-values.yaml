@@ -18,9 +18,10 @@ service:
     port: 11112
     protocol: TCP
     targetPort: 4242
-  annotations:
-    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
-    service.beta.kubernetes.io/azure-load-balancer-internal-subnet: "suitable-porpoise-lb-subnet"
+annotations:
+  service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+  service.beta.kubernetes.io/azure-load-balancer-internal-subnet: "suitable-porpoise-lb-subnet"
+  # there is also an annotations attribute at service level but it is overwritten and not taking effect. this annotation attribute at root level is applied to all resources.
 labels:
   app: istio-ingressgateway
   istio: ingressgateway
