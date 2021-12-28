@@ -1,0 +1,32 @@
+name: istio-ingressgateway
+service:
+  type: LoadBalancer
+  ports:
+  - name: status-port
+    port: 15021
+    protocol: TCP
+    targetPort: 15020
+  - name: http2
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 8443
+  - name: dicom
+    port: 11112
+    protocol: TCP
+    targetPort: 4242
+labels:
+  app: istio-ingressgateway
+  istio: ingressgateway
+annotations:
+  service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+  service.beta.kubernetes.io/azure-load-balancer-internal-subnet: "suitable-porpoise-lb-subnet"
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+nodeSelector:
+  beta.kubernetes.io/os: linux

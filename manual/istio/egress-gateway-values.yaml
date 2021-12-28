@@ -1,0 +1,13 @@
+# https://artifacthub.io/packages/helm/istio-official/gateway#egress-gateway
+name: istio-egressgateway
+service:
+  type: ClusterIP 
+labels:
+  app: istio-egressgateway
+  istio: egressgateway
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+nodeSelector:
+  beta.kubernetes.io/os: linux
