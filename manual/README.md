@@ -4,11 +4,16 @@
 This instruction is tested on Minikube but should work on any K8s cluster. It is based on Istio 1.12.1
 
 ### Install Minikube and Istio
+
+#### Install Minikube
 ```sh
 minikube start --memory=12288 --cpus=6 --kubernetes-version=v1.20.2 --nodes 3 --container-runtime=containerd --driver=hyperkit --disk-size=150g
 minikube addons enable metallb
 minikube addons configure metallb
 ```
+There are two approaches provided to install Istio. Files required in both approaches are located in the *[istio](https://github.com/digihunch/korthweb/tree/main/manual/istio)* directory. Choose one of the approaches below to complete istio installation.
+
+#### Approach 1. Install Istio using Overlay file
 Put in the IP address range for load balancer, for example: 192.168.64.16 - 192.168.64.23. Then install istio using istioctl with the overlay file.
 
 ```sh
@@ -18,6 +23,31 @@ The overlay file includes specifications required for this instruction, such as 
 ```sh
 kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 ```
+
+#### Approach 2. Install Istio using Helm Chart
+There are a number of Helm [Charts](https://artifacthub.io/packages/search?org=istio) for Istio components and they can be added to repo list:
+```sh
+helm repo add istio https://istio-release.storage.googleapis.com/charts
+helm repo update
+```
+Then we install components in the following sequence:
+```sh
+# use base chart to install crds, then verify with "kubectl get crds"
+helm install istio-base istio/base --create-namespace --namespace istio-system
+# use istiod chart to install istiod
+helm install istiod istio/istiod -f istiod-values.yaml --namespace istio-system --wait
+kubectl create namespace istio-gateway
+kubectl label namespace istio-gateway istio-injection=enabled
+# use gateway chart to install ingress gateway
+helm -n istio-gateway install istio-ingress istio/gateway -f ingress-gateway-values.yaml
+# use gateway chart to install egress gateway
+helm -n istio-gateway install istio-egress istio/gateway -f egress-gateway-values.yaml
+```
+In this approach, the istio gateway services are installed in a separate namespace called istio-gateway. Confirm the istio-ingress gateway running with the following command:
+```sh
+kubectl -n istio-gateway get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+```
+#### Configure DNS and addons
 To assist the testing in the rest of the instruction, we can add it to local host file (e.g. /etc/hosts for Mac and Linux), for example:
 ```
 192.168.64.16 web.orthweb.com
@@ -40,9 +70,15 @@ Let's generate key and certificate for CA, and use it to sign a certificate for 
 openssl req -x509 -sha256 -newkey rsa:4906 -keyout ca.key -out ca.crt -days 356 -nodes -subj '/CN=Health Certificate Authority'
 openssl req -new -newkey rsa:4096 -keyout server.key -out server.csr -nodes -subj '/CN=*.orthweb.com'
 openssl x509 -req -sha256 -days 365 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt
+```
+Then we import key, certificate and CA certificate into secrets for istio ingress Gateway to consume. If you installed Istio using overlay files, and the gateway is created in *istio-system* namespace, then create Secret in the same namespace:
+```sh
 kubectl create -n istio-system secret generic orthweb-cred --from-file=tls.key=server.key --from-file=tls.crt=server.crt --from-file=ca.crt=ca.crt
 ```
-The command above imports key, certificate and CA certificate into istio-system namespace for istio ingress Gateway to use. 
+If you install Istio using Helm charts, and the gateway is created in *istio-gateway* namespace, then create Secret in the same namespace:
+```sh
+kubectl create -n istio-gateway secret generic orthweb-cred --from-file=tls.key=server.key --from-file=tls.crt=server.crt --from-file=ca.crt=ca.crt
+```
 
 ### Deploy application
 We start with creating ConfigMaps, which creates the namespace orthweb and label it as requiring sidecar injection. Then we create the Secret needed for applicaiton to communicate with database. We use Helm to deploy the database and two YAML manifests for Deployment and Service to deploy the Orthanc application.
