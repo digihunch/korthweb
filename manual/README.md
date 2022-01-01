@@ -75,15 +75,10 @@ kubectl create -n istio-system secret generic orthweb-cred --from-file=tls.key=s
 We start with creating ConfigMaps, which creates the namespace orthweb and label it as requiring sidecar injection. Then we create the Secret needed for applicaiton to communicate with database. We use Helm to deploy the database and two YAML manifests for Deployment and Service to deploy the Orthanc application.
 ```sh
 kubectl apply -f orthweb-cm.yaml
-kubectl -n orthweb create secret tls tls-orthweb --cert=server.crt --key=server.key
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install postgres-ha bitnami/postgresql-ha \
-     --create-namespace --namespace orthweb \
-     --set pgpool.tls.enabled=true \
-     --set pgpool.tls.certificatesSecret=tls-orthweb \
-     --set pgpool.tls.certFilename=tls.crt \
-     --set pgpool.tls.certKeyFilename=tls.key \
-     --set postgresql.initdbScriptsCM=orthanc-dbinit \
+     --namespace orthweb \
+     --set postgresql.initdbScriptsCM=dbinit \
      --set volumePermissions.enabled=true
 ```
 Note that we provide SQL script (stored in orthanc-dbinit entry) to postgresql.initdbScriptsCM instead of pgpool.initdbScriptsCM because the altter doesn't take files with SQL extention, according to the [documentation](https://artifacthub.io/packages/helm/bitnami/postgresql-ha) of PostgreSQL helm chart.

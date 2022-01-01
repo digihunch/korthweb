@@ -8,6 +8,15 @@ metadata:
 kind: ConfigMap
 apiVersion: v1
 metadata:
+  name: dbinit
+  namespace: orthweb
+data:
+  db_create.sql: |
+    CREATE DATABASE orthancdb;
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
   name: orthanc-app
   namespace: orthweb
 data:
@@ -26,7 +35,7 @@ data:
         "Database" : "orthancdb",
         "Username" : "${DB_USERNAME}",
         "Password" : "${DB_PASSWORD}",
-        "EnableSsl" : true,
+        "EnableSsl" : false,
         "Lock" : false
       },
       "Plugins" : [
@@ -39,12 +48,3 @@ data:
   db.port: "5432"
   db.addr: "postgres-ha-postgresql-ha-pgpool.orthweb.svc.cluster.local"
   db.user: postgres
----
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: orthanc-dbinit
-  namespace: orthweb
-data:
-  db_create.sql: |
-    CREATE DATABASE orthancdb;
