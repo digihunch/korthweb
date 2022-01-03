@@ -1,0 +1,26 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: postgres-ha 
+spec:
+  releaseName: postgres-ha 
+  chart:
+    spec:
+      chart: postgresql-ha
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: flux-system
+      version: "8.1.4"
+  interval: 1h0m0s
+  install:
+    remediation:
+      retries: 3
+  values:
+    volumePermissions:
+      enabled: true
+    postgresql:
+      initdbScriptsCM: dbinit
+    pgpool:
+      tls:
+        enabled: true
