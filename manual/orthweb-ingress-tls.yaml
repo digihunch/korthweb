@@ -26,7 +26,7 @@ spec:
     - "web.orthweb.com"
     tls:
       mode: SIMPLE
-      credentialName: orthweb-cred # secret in the same namespace as the istio-ingressgateway resource
+      credentialName: orthweb-secret # secret in the same namespace as the istio-ingressgateway resource
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -65,7 +65,7 @@ spec:
     - "dicom.orthweb.com"
     tls:
       mode: SIMPLE
-      credentialName: orthweb-cred # secret in the same namespace as the istio-ingressgateway resource
+      credentialName: orthweb-secret # secret in the same namespace as the istio-ingressgateway resource
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService

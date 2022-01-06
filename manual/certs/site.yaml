@@ -1,0 +1,23 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: orthweb-cert
+  namespace: istio-system 
+spec:
+  commonName: orthweb.com 
+  secretName: orthweb-secret
+  duration: 2160h
+  renewBefore: 72h
+  subject:
+    organizations:
+      - digihunch
+  dnsNames:
+    - web.orthweb.com
+    - dcm.orthweb.com
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: my-ca-issuer
+    kind: Issuer
+    group: cert-manager.io

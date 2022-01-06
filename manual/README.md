@@ -60,15 +60,19 @@ To launch kiali from Minikube, run:
 istioctl dashboard kiali
 ```
 ### Configure certificates
-Let's generate key and certificate for CA, and use it to sign a certificate for our site.
+In this step, we generate key and certificate for ingress. We start by installing cert manager.
 ```sh
-openssl req -x509 -sha256 -newkey rsa:4906 -keyout ca.key -out ca.crt -days 356 -nodes -subj '/CN=Health Certificate Authority'
-openssl req -new -newkey rsa:4096 -keyout server.key -out server.csr -nodes -subj '/CN=*.orthweb.com'
-openssl x509 -req -sha256 -days 365 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt
+helm repo add jetstack https://charts.jetstack.io
+helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.0.3 --set installCRDs=true
 ```
-Then we import key, certificate and CA certificate into secrets for istio ingress Gateway to consume. The secret and the gateway service must be in the same namespace. Create Secret with this command: 
+Then we create key, certificate and CA certificate into secrets for istio ingress Gateway to consume. The secret and the gateway service must be in the same namespace. Create Secret with this command: 
 ```sh
-kubectl create -n istio-system secret generic orthweb-cred --from-file=tls.key=server.key --from-file=tls.crt=server.crt --from-file=ca.crt=ca.crt
+kubectl apply -f certs/ca.yaml
+kubectl apply -f certs/site.yaml
+```
+A secret named orthweb-secret is created in namespace istio-system. To view the certificate, parse and decode the secret:
+```sh
+openssl x509 -in <(kubectl -n istio-system get secret orthweb-secret -o jsonpath='{.data.ca\.crt}' | base64 -d) -text -noout
 ```
 
 ### Deploy application

@@ -25,7 +25,7 @@ We need these tools to complete installation.
 * [helm](https://helm.sh/docs/intro/install/): helm is package manager for Kubernetes.
 
 ## Deploy Orthanc using helm
-The helm chart is stored in orthanc sub-directory
+Currently, the Helm chart is not released. Users will need to clone this repository. In the repo, the helm chart is stored in orthanc sub-directory
 ```sh
 helm dependency update orthanc
 ```
