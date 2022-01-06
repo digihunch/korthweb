@@ -1,10 +1,26 @@
 # Korthweb - Orthanc deployment on Kubernetes
-Korthweb is an open-source project to deploy [Orthanc](https://www.orthanc-server.com/) on Kubernetes platform. Orthanc is an open-source application to ingest, store, display and distribute medical images. Korthweb uses Helm for automation, and Istio for ingress and observability. Korthweb is a sister project of [Orthweb](https://github.com/digihunch/orthweb), an deployment automation project for Orthanc in AWS. 
+Korthweb is an open-source project to deploy [Orthanc](https://www.orthanc-server.com/) on Kubernetes platform. Orthanc is an open-source application to ingest, store, display and distribute medical images. Korthweb provides a number of deployment approaches. Korthweb is a sister project of [Orthweb](https://github.com/digihunch/orthweb), an deployment automation project for Orthanc on AWS EC2. 
 
-## Prerequisite
+## Kubernetes Cluster
+
+We need a Kubernetes cluster. If you do not have a cluster, refer to the instruction in the *[cluster](https://github.com/digihunch/korthweb/tree/main/cluster)* directory to build a Kubernetes cluster first.
 
 
-## Toolings
+## Approaches
+This project explores the following deployment approaches.
+| Approach | Tools | Description |  |
+|--|--|--|--|
+| Manual | kubectl, helm, Istioctl | Use YAML manifests and external Helm charts to install Istio, PostgreSQL and Orthanc. Use this approach for troubleshooting and learning. For automation, go with the GitOps approach. | 
+| GitOps | kubectl, helm, flux | The files help FluxCD install Istio, PostgreSQL, and Orthanc. Istio provides mTLS between services, and Ingress for north-south traffic. This approach is to automate the steps in the Manual approach. |
+| Helm Chart | kubectl, helm  | This repo provides a Helm chart named orthanc is created to install PostgreSQL (installing external charts) and Orthanc. The Chart also configures TLS between Orthanc and PostgreSQL.  |
+
+Each approach has its own sub-directory with instruction in their respective sub-directory.
+* [Manual](https://github.com/digihunch/korthweb/tree/main/manual)
+* [GitOps](https://github.com/digihunch/korthweb/tree/main/gitops)
+* [Helm Chart](https://github.com/digihunch/korthweb/tree/main/helm)
+
+
+## Tools
 
 ### Helm Chart
 The purpose of this repo is to provide a Helm Chart to deploy Orthanc on Kubernetes with a single command, including the creation of self-signed certificates. The Helm Chart is defined in the *[orthanc](https://github.com/digihunch/korthweb/tree/main/orthanc)* directory and is customizable with parameters. The rest of this instruction is based on automatic deployment.
