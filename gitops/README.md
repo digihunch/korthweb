@@ -5,8 +5,8 @@ install automatically with fluxcd
 ```sh
 flux bootstrap github \
     --owner=digihunch \
-    --repository=korthops \
+    --repository=korthweb \
     --branch=main \
     --personal \
-    --path=environment/dev
+    --path=gitops/environment/dev
 ```
