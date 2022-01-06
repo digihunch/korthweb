@@ -1,3 +1,14 @@
+
+
+We need a Kubernetes cluster as the platform to run Helm Chart. Depending on your use case, consider the following options for Kubernetes cluster:
+| Use case | Description | How to create |
+|--|--|--|
+| Playground | Multi-node cluster on single machine to start instantly for POC.| Use Minikube on MacOS or kind on WSL2. Check out my [post](https://www.digihunch.com/2021/09/single-node-kubernetes-cluster-minikube/) for the reason for this choice. |
+| Demo | Multi-node cluster on public cloud platform such as EKS on AWS, AKS on Azure or GKE on GCP. | CLI tools by the cloud vendor can typically handle this level of complexity. Working instructions are provided for reference in the [cluster](https://github.com/digihunch/korthweb/blob/main/cluster/README.md)  directory of this project. |
+| Professional | Clusters on private networks in public cloud or private platform for test and production environments.  | The cluster infrastructure should be managed as IaC (Infrastructure as Code) specific to your environment. Reference implementation provided in [CloudKube](https://github.com/digihunch/cloudkube) project. Contact [DigiHunch](https://www.digihunch.com/contact/) for professional service to customize the cluster.|
+
+
+
 ### Platform CLI
 Depending on the cloud platform, we need one or more of the CLI tools. Please refer to their respective instructions to install  and configure them. 
 * [awscli](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html): If we use EKS, we rely on awscli to connect to resources in AWS. The credentials for programatic access is stored under profile. Instruction is [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html). 
