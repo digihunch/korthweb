@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: orthweb
+resources:
+  - service.yaml 
+  - deployment.yaml
+  - hpa.yaml
+  - web-ingress.yaml
+  - dicom-ingress.yaml
+configMapGenerator:
+- name: orthanc-app
+  files:
+  - orthanc.json
+  literals:
+  - db.engine=postgres
+  - db.port=5432
+  - db.addr=postgres-ha-postgresql-ha-pgpool.orthweb.svc.cluster.local
+  - db.user=postgres
+
+# https://github.com/kubernetes-sigs/kustomize/issues/3875

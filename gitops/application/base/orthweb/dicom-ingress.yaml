@@ -1,0 +1,35 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: dcm-gw
+  namespace: orthweb
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 11112
+      name: dicom
+      protocol: TLS
+    hosts:
+    - "dicom.orthweb.com"
+    tls:
+      mode: SIMPLE
+      credentialName: orthweb-secret # secret in the same namespace as the istio-ingressgateway resource
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: dcm-vs
+  namespace: orthweb
+spec:
+  hosts:
+  - "dicom.orthweb.com"
+  gateways:
+  - dcm-gw
+  tcp:
+  - route:
+    - destination:
+        host: orthweb # service label
+        port:
+          number: 4242

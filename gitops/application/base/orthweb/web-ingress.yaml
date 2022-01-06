@@ -1,0 +1,35 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: web-gw
+  namespace: orthweb
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    hosts:
+    - "web.orthweb.com"
+    tls:
+      mode: SIMPLE
+      credentialName: orthweb-secret # secret in the same namespace as the istio-ingressgateway resource
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: web-vs
+  namespace: orthweb
+spec:
+  hosts:
+  - "web.orthweb.com"
+  gateways:
+  - web-gw
+  http:
+  - route:
+    - destination:
+        host: orthweb # service label
+        port:
+          number: 8042
