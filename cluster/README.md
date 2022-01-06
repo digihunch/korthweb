@@ -18,7 +18,10 @@ Depending on the cloud platform, we need one or more of the CLI tools. Please re
 
 
 ## Kubernetes cluster
-
+### Kind
+```sh
+kind create cluster --config=kind-config.yaml
+```
 In this section, we build Kubernetes cluster and update local kubectl context so that we can continue with deployment steps below. We also cover how to delete the cluster.
 ### AWS EKS
 
