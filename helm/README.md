@@ -1,17 +1,19 @@
-## Deploy Orthanc using helm
-Currently, the Helm chart is not released. Users will need to clone this repository. In the repo, the helm chart is stored in orthanc sub-directory
+# Deploy Orthanc as Helm Chart
+In this directory, we build a Helm Chart called orthanc. The content of the Chart is stored in the *orthanc* directory. Currently, this chart is not released. Therefore, users need to clone this repo first and enter the helm sub-directory.
+```sh
+git clone git@github.com:digihunch/korthweb.git
+cd korthweb/helm
+```
+The chart is stored as the sub-directory named *orthanc*. We can update dependency and then install the chart:
 ```sh
 helm dependency update orthanc
-```
-From orthweb directory, run:
-```sh
 helm install orthweb orthanc --create-namespace --namespace orthweb 
 ```
-To uninstall (and remove persistent volumes for database) 
+Once installation is completed, check Pod status in the orthweb namespace. To uninstall (and remove persistent volumes for database) 
 ```sh
 helm -n orthweb uninstall orthweb && kubectl -n orthweb delete pvc -l app.kubernetes.io/component=postgresql 
 ```
-## Test the site after automatic deployment
+## Validation
 The helm chart by default does a lot of automation, including the creation of certificates for the following three domain name. The helm chart also creates a public facing load balancer. we need to collect some information before validation.
 db.orthweb.com
 dcm.orthweb.com

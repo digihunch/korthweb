@@ -1,13 +1,11 @@
+# Build a Kubernetes cluster for Orthanc
 
-
-We need a Kubernetes cluster as the platform to run Helm Chart. Depending on your use case, consider the following options for Kubernetes cluster:
+We need a Kubernetes cluster as the platform to run Orthanc workload. Depending on your requirement, consider the following options for Kubernetes cluster:
 | Use case | Description | How to create |
 |--|--|--|
-| Playground | Multi-node cluster on single machine to start instantly for POC.| Use Minikube on MacOS or kind on WSL2. Check out my [post](https://www.digihunch.com/2021/09/single-node-kubernetes-cluster-minikube/) for the reason for this choice. |
-| Demo | Multi-node cluster on public cloud platform such as EKS on AWS, AKS on Azure or GKE on GCP. | CLI tools by the cloud vendor can typically handle this level of complexity. Working instructions are provided for reference in the [cluster](https://github.com/digihunch/korthweb/blob/main/cluster/README.md)  directory of this project. |
+| Playground | Multi-node cluster on single machine to start instantly for POC.| Pick a technology depending on your OS. On MacOS, use Minikube; On Windows with WSL2, use kind with Docker. On Windows without WSL2, use Minikube. Check [here]((https://www.digihunch.com/2021/09/single-node-kubernetes-cluster-minikube/)) for instructions. |
+| Staging | Multi-node cluster on public cloud platform such as EKS on AWS, AKS on Azure or GKE on GCP. | CLI tools by the cloud vendor can typically handle this level of complexity. Working instructions are provided for reference in the [cluster](https://github.com/digihunch/korthweb/blob/main/cluster/README.md)  directory of this project. |
 | Professional | Clusters on private networks in public cloud or private platform for test and production environments.  | The cluster infrastructure should be managed as IaC (Infrastructure as Code) specific to your environment. Reference implementation provided in [CloudKube](https://github.com/digihunch/cloudkube) project. Contact [DigiHunch](https://www.digihunch.com/contact/) for professional service to customize the cluster.|
-
-
 
 ### Platform CLI
 Depending on the cloud platform, we need one or more of the CLI tools. Please refer to their respective instructions to install  and configure them. 
@@ -16,13 +14,6 @@ Depending on the cloud platform, we need one or more of the CLI tools. Please re
 * [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/): If we use AKS, we use az cli to interact with Azure. Alternatively, we can use [Azure CloudShell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview), which has Azure CLI, kubectl, and helm pre-installed.
 * [gcloud](https://cloud.google.com/sdk/docs/install): If we use GKE, we use gcloud as client tool. Note that we can simply use GCP's [cloud shell](https://cloud.google.com/shell), which has gcloud and kubectl pre-installed and pre-configured.
 
-
-## Kubernetes cluster
-### Kind
-```sh
-kind create cluster --config=kind-config.yaml
-```
-In this section, we build Kubernetes cluster and update local kubectl context so that we can continue with deployment steps below. We also cover how to delete the cluster.
 ### AWS EKS
 
 On AWS, we use eksctl with a template to create EKS cluster,  The template cluster.yaml is located in eks directory.

@@ -1,28 +1,29 @@
 
-## (Manually) Deploy Orthanc with Istio Ingress
+# Deploy Orthanc the manual way
 
-This instruction is tested on Minikube but should work on any K8s cluster. It is based on Istio 1.12.1
+In this instruction, we deploy Orthanc manually. Use this instruction only if you need to troubleshoot or understand the deployment details. Otherwise, for automated deployment, use other [options](https://github.com/digihunch/korthweb/blob/main/README.md).
 
+The steps were tested on Minikube but should work on any K8s cluster.
 ### Install Minikube and Istio
-
-#### Install Minikube
+To start, we can install Minikube and configure a load balancer using Metal LB
 ```sh
 minikube start --memory=12288 --cpus=6 --kubernetes-version=v1.20.2 --nodes 3 --container-runtime=containerd --driver=hyperkit --disk-size=150g
 minikube addons enable metallb
 minikube addons configure metallb
 ```
-There are two approaches provided to install Istio. Files required in both approaches are located in the *[istio](https://github.com/digihunch/korthweb/tree/main/manual/istio)* directory. Choose one of the approaches below to complete istio installation.
+The last command prompt for the load balancer's IP address range. For example, we can specify 192.168.64.16 - 192.168.64.23 as IPs for load balancers. Then we can isntall Istio.
 
-#### Approach 1. Install Istio using Overlay file
-Put in the IP address range for load balancer, for example: 192.168.64.16 - 192.168.64.23. Then install istio using istioctl with the overlay file.
+There are two approaches provided to install Istio. The files required are located in the *[istio](https://github.com/digihunch/korthweb/tree/main/manual/istio)* directory. 
+#### Option 1. Install Istio using Overlay file
+ Then install istio using istioctl with the overlay file.
 
 ```sh
 istioctl install -f overlay.yaml -y --verify
 ```
 The overlay file includes specifications required for this instruction, such as ports. The stdout may report "no Istio installation found" which is not a concern. 
 
-#### Approach 2. Install Istio using Helm Chart
-There are a number of Helm [Charts](https://artifacthub.io/packages/search?org=istio) for Istio components and they can be added to repo list:
+#### Option 2. Install Istio using Helm Chart
+As of late 2021 Istio supports using Helm Chart for installation. There are a number of Helm [Charts](https://artifacthub.io/packages/search?org=istio) for Istio components and they should be added to repo list first:
 ```sh
 helm repo add istio https://istio-release.storage.googleapis.com/charts
 helm repo update
@@ -75,7 +76,7 @@ A secret named orthweb-secret is created in namespace istio-system. To view the 
 openssl x509 -in <(kubectl -n istio-system get secret orthweb-secret -o jsonpath='{.data.ca\.crt}' | base64 -d) -text -noout
 ```
 
-### Deploy application
+### Deploy database and application
 We start with creating ConfigMaps, which creates the namespace orthweb and label it as requiring sidecar injection. Then we create the Secret needed for applicaiton to communicate with database. We use Helm to deploy the database and two YAML manifests for Deployment and Service to deploy the Orthanc application.
 ```sh
 kubectl apply -f orthweb-cm.yaml
@@ -99,7 +100,6 @@ The first manifest defines Pods in a Deployment. The Pods contains [readiness pr
 kubectl apply -f orthweb-ingress-tls.yaml
 ```
 The command above configures istio ingress with TLS termination. 
-
 
 ### Validation
 
@@ -130,4 +130,3 @@ To test Kubernetes Service without Ingress, use port forwarding.
 kubectl -n orthweb port-forward service/web-svc 8042:8042
 curl -k -X GET https://0.0.0.0:8042/app/explorer.html -I -u orthanc:orthanc
 ```
-

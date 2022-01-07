@@ -2,40 +2,48 @@
 Korthweb is an open-source project to deploy [Orthanc](https://www.orthanc-server.com/) on Kubernetes platform. Orthanc is an open-source application to ingest, store, display and distribute medical images. Korthweb provides a number of deployment approaches. Korthweb is a sister project of [Orthweb](https://github.com/digihunch/orthweb), an deployment automation project for Orthanc on AWS EC2. 
 
 ## Kubernetes Cluster
-
-We need a Kubernetes cluster. If you do not have a cluster, refer to the instruction in the *[cluster](https://github.com/digihunch/korthweb/tree/main/cluster)* directory to build a Kubernetes cluster first.
-
+This project requires a Kubernetes cluster. If you do not have one, refer to the instruction in the *[cluster](https://github.com/digihunch/korthweb/tree/main/cluster)* directory to build a Kubernetes cluster first.
 
 ## Deployment Approaches
-This project explores the following deployment approaches.
-| Approach | Tools | Description |  |
-|--|--|--|--|
-| Manual | kubectl, helm, Istioctl | Use YAML manifests and external Helm charts to install Istio, PostgreSQL and Orthanc. Use this approach for troubleshooting and learning. For automation, go with the GitOps approach. | 
-| GitOps | kubectl, helm, flux | The files help FluxCD install Istio, PostgreSQL, and Orthanc. Istio provides mTLS between services, and Ingress for north-south traffic. This approach is to automate the steps in the Manual approach. |
-| Helm Chart | kubectl, helm  | This repo provides a Helm chart named orthanc is created to install PostgreSQL (installing external charts) and Orthanc. The Chart also configures TLS between Orthanc and PostgreSQL.  |
+This project explores the following deployment approaches. Each approach has its own sub-directory with instruction in their respective sub-directory.
+| Option | Tools | Description |
+|--|--|--|
+| [Manual](https://github.com/digihunch/korthweb/tree/main/manual) | kubectl, helm, Istioctl | Use YAML manifests from this sub-directory along with external Helm charts to install Istio, PostgreSQL and Orthanc workload step-by-step. Take this approach only for troubleshooting and learning. For automation, users should go with the GitOps approach. |
+| [GitOps](https://github.com/digihunch/korthweb/tree/main/gitops) | kubectl, helm, flux | The files in this sub-directory defines the state of workload, including Istio, PostgreSQL and Orthanc. FluxCD sync the configuration to the Kubernetes cluster. Istio provides mTLS between services, and Ingress for north-south traffic. Users take this approach to deploy workload without dealing with deployment details.
+| [Helm Chart](https://github.com/digihunch/korthweb/tree/main/helm) | kubectl, helm  | This sub-directory provides a Helm chart named Orthanc, which references external charts (e.g. PostgreSQL) and configures Orthanc workload. The Chart also configures TLS between Orthanc and PostgreSQL.  
 
-Each approach has its own sub-directory with instruction in their respective sub-directory.
-* [Manual](https://github.com/digihunch/korthweb/tree/main/manual)
-* [GitOps](https://github.com/digihunch/korthweb/tree/main/gitops)
-* [Helm Chart](https://github.com/digihunch/korthweb/tree/main/helm)
-
-The following tools are used:
+One or more of the following tools are used, depending on the approach of choice:
 * [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl): connect to API server to manage the Kubernetes cluster. With multiple clusters, you need to [switch context](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/).
 * [helm](https://helm.sh/docs/intro/install/): helm is package manager for Kubernetes. It is used in all three approaches to install third party charts such as PostgreSQL
 * [istioctl](https://helm.sh/docs/intro/install/): istioctl is an alternative to helm to install istio manually.
-* [flux](https://fluxcd.io/docs/): FluxCD is a GitOps tool to keep target Kubernetes cluster in sync with the source of configuration in the GitOps directory.
+* [flux](https://fluxcd.io/docs/): FluxCD is a GitOps tool to keep target Kubernetes cluster in sync with the source of configuration in the GitOps directory. The name of FluxCD's CLI tool is *flux*.
+
+For detailed instructions with each option, please go to the sub-directory that represents the intended option.
 
 ## Architectural Considerations
+This section discusses the choice of deployment patterns and tools. To host Orthanc application in a minimum viable deployment, the following tiers are currently included:
+| Component | Tier | Description |
+|--|--|--|
+|Orthanc|Application|The front end workload using official Docker image released by Orthanc. The Pods are managed as Kubernetes Deployment. Each Pod connects to PostgreSQL service for database and image storage. Two TCP ports are exposed, 8042 for HTTP traffic, and 4242 for DICOM traffic.
+|PostgreSQL|Database|If available, a managed database instance should be used. The Korthweb project assumes that no managed PostgreSQL service is available, therefore it deploys Postgres HA instance using Bitnami's Helm Chart. It also requires persistent volumes available to the Kubernetes cluster. |
+|Istio|Service Mesh|Infrastructure layer using Istio as Service Mesh, to provide Ingress, TLS termination, mTLS between services, and potentially observability features. Istio can be installed by its official Helm Chart, or alternatively, using istioctl.
 
-### Helm Chart
-The purpose of this repo is to provide a Helm Chart to deploy Orthanc on Kubernetes with a single command, including the creation of self-signed certificates. The Helm Chart is defined in the *[orthanc](https://github.com/digihunch/korthweb/tree/main/orthanc)* directory and is customizable with parameters. The rest of this instruction is based on automatic deployment.
-The directory *[manual](https://github.com/digihunch/korthweb/tree/main/manual)* is also kept in this repository to help userstand the deployment and guide development of Helm Chart.
-*Note*: currently, the automatic deployment doesn't support Istio because of some limitation with Helm. See [readme](https://github.com/digihunch/korthweb/blob/main/istio/README.md).
+The purpose of Korthweb deployment project is to install all tiers and ensure they are integrated and functional as intended.
 
-### Istio Service Mesh
-Applications running as [microservices](https://www.digihunch.com/2021/11/from-microservice-to-service-mesh/) requires many common features for observability (e.g. tracing), security (e.g. mTLS), traffic management (e.g. ingress and egress, traffic splitting), and resiliency (circuit breaking, retry/timeout). Service Mesh commodifies these features into a layer between Kubernetes platform and the workload. Istio is a popular choice for Service Mesh. 
+### Why Istio
+Originally I was looking for an Ingress controller that supports both HTTPS and TLS (for DICOM) traffic. Further along I discovered the benefit of using a [service mesh](https://www.digihunch.com/2021/12/from-ingress-to-gateway-why-you-need-istio-gateways-on-kubernetes-platforms/) for  [microservices](https://www.digihunch.com/2021/11/from-microservice-to-service-mesh/). Essentially, with a separate layer between the workload and the platform, service mesh commoditizes many common features related to observability (e.g. tracing), security (e.g. mTLS), traffic management (e.g. ingress and egress, traffic splitting), and resiliency (circuit breaking, retry/timeout). 
 
+Istio is a popular choice for Service Mesh. In this project, we mainly use istio for Ingress, TLS termination, mTLS and observability. If Istio is present, there is no need to explicitly configure TLS between application and database, because by default Istio's [sidecar](https://istio.io/latest/docs/ops/configuration/traffic-management/tls-configuration/) applies mTLS to all connections.
+### Why Helm
+Even with the manual approach, we run external Helm Charts for simplicity. Deploying a servce such as PostgreSQL database with HA can be very involving and there is no point to reinvent the wheel. We use well-built Charts from Repos of reliable third party.
 
+In our Helm Chart deployment option, we build our own Helm Chart called *orthanc* in an attempt to consoliate all deployment activities. This orthanc Helm chart includes dependency charts such as PostgreSQL HA. It also includes default configuration options so that user can run deployment with a single command. 
 
+As I realized later the limitations with bundling everything inside of a single Helm Chart, I stopped adding more features to this option. Therefore the Helm Chart option is considered legacy, and stops short of Istio installation.
 
+### Why GitOps 
+With GitOps, source of truth about the deployment is declared in this repo's GitOps directory, and a tool (in our project, FluxCD) is used to keep the target kubernetes cluster in sync. FluxCD is a popular tool for GitOps. Our GitOps deployment option still employs external Helm charts, but at a higher level the application can be managed using Kustomize. Therefore not everything has to be built as part of Helm Chart. 
+
+### TLS Certificate
+In this project, we provision self-signed certificate to get the website up and running. In real deployment, a validate certificate issued by a CA should be used instead. In the GitOps and manual approach, we use Cert Manager to provision certificates. In the Helm approach, we use Helm template functin. For more details, refer to [this](https://www.digihunch.com/2022/01/creating-self-signed-x509-certificate/) post.
 
