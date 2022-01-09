@@ -28,9 +28,15 @@ dependencies:
     name: postgresql-ha
     repository: https://charts.bitnami.com/bitnami
     version: 8.x.x
-    #alias: database # note: alias here will cause changes in service name. many other configuration depends on the service name
+    #alias: database # note: alias here will cause changes in service name.
     tags:
     - orthanc-database
+  - condition: traefik.enabled
+    name: traefik
+    repository: https://helm.traefik.io/traefik
+    version: 10.x.x
+    tags:
+    - orthanc-traefik
 #  - condition: logging.enabled
 #    name: elasticsearch
 #    repository: https://helm.elastic.co

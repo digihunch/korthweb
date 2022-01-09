@@ -2,16 +2,7 @@
 # Deploy Orthanc the manual way
 
 In this instruction, we deploy Orthanc manually. Use this instruction only if you need to troubleshoot or understand the deployment details. Otherwise, for automated deployment, use other [options](https://github.com/digihunch/korthweb/blob/main/README.md).
-
-The steps were tested on Minikube but should work on any K8s cluster.
-### Install Minikube and Istio
-To start, we can install Minikube and configure a load balancer using Metal LB
-```sh
-minikube start --memory=12288 --cpus=6 --kubernetes-version=v1.20.2 --nodes 3 --container-runtime=containerd --driver=hyperkit --disk-size=150g
-minikube addons enable metallb
-minikube addons configure metallb
-```
-The last command prompt for the load balancer's IP address range. For example, we can specify 192.168.64.16 - 192.168.64.23 as IPs for load balancers. Then we can isntall Istio.
+### Install Istio
 
 There are two approaches provided to install Istio. The files required are located in the *[istio](https://github.com/digihunch/korthweb/tree/main/manual/istio)* directory. 
 #### Option 1. Install Istio using Overlay file
@@ -123,10 +114,4 @@ To validate database service, SSH to a workload pod (with some [args](https://ku
 ```sh
 export PGPASSWORD=$DB_PASSWORD && apt update && apt install postgresql postgresql-contrib
 psql --host=$DB_ADDR --port $DB_PORT --username=$DB_USERNAME sslmode=require
-```
-
-To test Kubernetes Service without Ingress, use port forwarding. 
-```sh
-kubectl -n orthweb port-forward service/web-svc 8042:8042
-curl -k -X GET https://0.0.0.0:8042/app/explorer.html -I -u orthanc:orthanc
 ```

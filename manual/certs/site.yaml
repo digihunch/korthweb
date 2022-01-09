@@ -13,7 +13,7 @@ spec:
       - digihunch
   dnsNames:
     - web.orthweb.com
-    - dcm.orthweb.com
+    - dicom.orthweb.com
   privateKey:
     algorithm: ECDSA
     size: 256

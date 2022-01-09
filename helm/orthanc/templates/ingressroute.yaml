@@ -1,0 +1,35 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: web-ingressroute
+  namespace: {{ $.Release.Namespace | quote }} 
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - match: Host(`{{ .Values.https.certCommonName }}`)
+      kind: Rule
+      services:
+        - name: orthweb-orthanc
+          port: http
+          strategy: RoundRobin
+  tls:
+    secretName: {{ .Values.https.certCommonName | quote }} 
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: dicom-ingressroute
+  namespace: {{ $.Release.Namespace | quote }}
+spec:
+  entryPoints:
+    - dicomtls
+  routes:
+    - match: HostSNI(`{{ .Values.dcmtls.certCommonName }}`)
+      services:
+        - name: orthweb-orthanc
+          port: dicom 
+  tls:
+    secretName: {{ .Values.dcmtls.certCommonName | quote }} 
+    passthrough: false
