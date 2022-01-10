@@ -12,7 +12,7 @@ A playground cluster can usually be created on a MacBook or PC, with a tool of c
 ### Minikube
 Minikube is recommended for MacOS.
 1. Install hypberkit and minikube with HomeBrew
-2. Create
+2. Create a cluster with three nodes.
 ```sh
 minikube start --memory=12288 --cpus=6 --kubernetes-version=v1.20.2 --nodes 3 --container-runtime=containerd --driver=hyperkit --disk-size=150g
 minikube addons enable metallb
@@ -30,7 +30,18 @@ To destroy the cluster, run:
 minikube stop && minikube delete
 ```
 ### Kind
-Kind is recommended for Windows with WSL2. Todo: Instruction for Kind on Windows WSL2 including how to destroy.
+Kind is recommended for Windows with WSL2. 
+1. Install [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries) on WSL2, and go to cluster directory of this repo.
+2. Create cluster with cluster.yaml as input
+```sh
+kind create cluster --config=kind-config.yaml
+```
+3. configure metallb as [load balancer](https://kind.sigs.k8s.io/docs/user/loadbalancer/#installing-metallb-using-default-manifests). The cluster is completed.
+
+To delete cluster
+```sh
+kind delete cluster --name kind
+```
 
 ## Create a staging cluster
 Depending on the cloud platform, we need one or more of the CLI tools. Please refer to their respective instructions to install  and configure them. 
