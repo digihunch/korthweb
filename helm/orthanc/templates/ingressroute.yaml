@@ -1,4 +1,16 @@
 apiVersion: traefik.containo.us/v1alpha1
+kind: TLSOption
+metadata:
+  name: orthweb-tls-option
+  namespace: {{ $.Release.Namespace | quote }}
+spec:
+  minVersion: VersionTLS12
+  maxVersion: VersionTLS13
+  clientAuth:
+    clientAuthType: NoClientCert
+  sniStrict: true
+---
+apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
   name: web-ingressroute
@@ -16,6 +28,9 @@ spec:
           strategy: RoundRobin
   tls:
     secretName: {{ .Values.https.certCommonName | quote }} 
+    options:
+      name: orthweb-tls-option
+      namespace: {{ $.Release.Namespace | quote }}
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRouteTCP
@@ -33,3 +48,6 @@ spec:
   tls:
     secretName: {{ .Values.dcmtls.certCommonName | quote }} 
     passthrough: false
+    options:
+      name: orthweb-tls-option
+      namespace: {{ $.Release.Namespace | quote }}
