@@ -3,6 +3,6 @@ kind: Kustomization
 namespace: orthweb
 resources:
   - namespace.yaml
-  - ../base/orthweb
+  - ../base/orthanc
 transformers:
   - labels.yaml
