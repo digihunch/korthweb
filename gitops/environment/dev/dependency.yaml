@@ -10,6 +10,6 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./gitops/dependency
+  path: ./gitops/dependency/dev
   prune: true
   validation: client
