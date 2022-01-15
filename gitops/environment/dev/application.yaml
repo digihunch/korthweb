@@ -6,7 +6,6 @@ metadata:
 spec:
   interval: 10m0s
   dependsOn:
-    - name: infrastructure
     - name: dependency
   sourceRef:
     kind: GitRepository

@@ -11,8 +11,8 @@ spec:
   path: ./gitops/infrastructure
   prune: true
   validation: client
-  healthChecks:
-    - apiVersion: apps/v1
-      kind: Deployment
-      name: postgres-ha-postgresql-ha-pgpool
-      namespace: orthweb
+#  healthChecks:
+#    - apiVersion: apps/v1
+#      kind: Deployment
+#      name: postgres-ha-postgresql-ha-pgpool
+#      namespace: orthweb
