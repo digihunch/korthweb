@@ -13,7 +13,7 @@ patchesStrategicMerge:
   metadata:
     name: orthanc-app
   data:
-    db.addr: postgres-ha-postgresql-ha-pgpool.orthweb.svc.cluster.local 
+    db.addr: postgres-ha-postgresql-ha-pgpool.dev-orthweb.svc.cluster.local 
 patches:
   - patch: |-
       - op: replace
