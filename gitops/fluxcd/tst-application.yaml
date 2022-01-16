@@ -1,0 +1,28 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: tst-application
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  dependsOn:
+    - name: tst-dependency
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./gitops/application/tst
+  prune: true
+  validation: client
+  healthChecks:  
+    - apiVersion: networking.istio.io/v1alpha3 
+      kind: Gateway
+      name: web-gw
+      namespace: tst-orthweb
+    - apiVersion: networking.istio.io/v1alpha3 
+      kind: Gateway
+      name: dcm-gw
+      namespace: tst-orthweb
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: orthanc
+      namespace: tst-orthweb

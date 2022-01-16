@@ -1,0 +1,53 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: tst-orthweb
+resources:
+  - namespace.yaml
+  - ../base/orthanc
+transformers:
+  - labels.yaml
+images:
+- name: orthanc-plugins
+  newName: jodogne/orthanc-plugins
+  newTag: 1.9.7
+patchesStrategicMerge:
+- |-
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: orthanc-app
+  data:
+    db.addr: postgres-ha-postgresql-ha-pgpool.tst-orthweb.svc.cluster.local 
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/servers/0/hosts
+        value:
+        - dicom.tst.orthweb.com
+    target:
+      kind: Gateway
+      name: dcm-gw
+  - patch: |-
+      - op: replace
+        path: /spec/servers/0/hosts
+        value:
+        - web.tst.orthweb.com
+    target:
+      kind: Gateway
+      name: web-gw
+  - patch: |-
+      - op: replace
+        path: /spec/hosts
+        value:
+        - dicom.tst.orthweb.com
+    target:
+      kind: VirtualService 
+      name: dcm-vs
+  - patch: |-
+      - op: replace
+        path: /spec/hosts
+        value:
+        - web.tst.orthweb.com
+    target:
+      kind: VirtualService
+      name: web-vs
