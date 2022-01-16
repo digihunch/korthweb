@@ -21,10 +21,18 @@ spec:
           defaultMode: 0755
       containers:
       - name: orthanc
-        image: jodogne/orthanc-plugins
+        image: orthanc-plugins
         args: ["/run/secrets/"]
         ports:
           - containerPort: 8042
+          - containerPort: 4242
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi" 
+            cpu: "500m"
         env:
           - name: DB_PASSWORD
             valueFrom:

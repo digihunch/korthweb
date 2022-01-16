@@ -6,6 +6,10 @@ resources:
   - ../base/orthanc
 transformers:
   - labels.yaml
+images:
+- name: orthanc-plugins
+  newName: jodogne/orthanc-plugins
+  newTag: 1.9.7
 patchesStrategicMerge:
 - |-
   apiVersion: v1
