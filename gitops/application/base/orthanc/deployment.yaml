@@ -25,7 +25,7 @@ spec:
         args: ["/run/secrets/"]
         ports:
           - containerPort: 8042
-          - containerPort: 4242
+        #  - containerPort: 4242
         resources:
           requests:
             memory: "64Mi"
