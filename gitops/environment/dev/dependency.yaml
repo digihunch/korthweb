@@ -33,6 +33,6 @@ spec:
       namespace: dev-orthweb
     - apiVersion: helm.toolkit.fluxcd.io/v2beta1
       kind: HelmRelease
-      name: postgresql-ha
+      name: postgres-ha 
       namespace: dev-orthweb
  
