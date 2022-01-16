@@ -8,3 +8,13 @@ resources:
   - ../base/postgres
 transformers:
   - labels.yaml
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/dnsNames 
+        value:
+        - web.dev.orthweb.com 
+        - dicom.dev.orthweb.com
+    target:
+      kind: Certificate
+      name: orthweb-cert
