@@ -17,6 +17,6 @@ spec:
     algorithm: ECDSA
     size: 256
   issuerRef:
-    name: my-ca-issuer
+    name: int-ca-issuer
     kind: Issuer
     group: cert-manager.io
