@@ -13,3 +13,26 @@ spec:
   path: ./gitops/dependency/dev
   prune: true
   validation: client
+  targetNamespace: dev-orthweb
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: postgres-ha-postgresql-ha-pgpool
+      namespace: dev-orthweb
+    - apiVersion: cert-manager.io/v1
+      kind: Certificate
+      name: orthweb-cert
+      namespace: dev-orthweb
+    - apiVersion: helm.toolkit.fluxcd.io/v2beta1 
+      kind: HelmRelease
+      name: istio-egress
+      namespace: dev-orthweb
+    - apiVersion: helm.toolkit.fluxcd.io/v2beta1 
+      kind: HelmRelease
+      name: istio-ingress
+      namespace: dev-orthweb
+    - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+      kind: HelmRelease
+      name: postgresql-ha
+      namespace: dev-orthweb
+ 
