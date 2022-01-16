@@ -14,8 +14,8 @@ spec:
   commonName: int-ca
   secretName: int-ca-secret
   privateKey:
-    algorithm: ECDSA
-    size: 256
+    algorithm: RSA 
+    size: 2048
   issuerRef:
     name: selfsigned-root-issuer
     kind: Issuer

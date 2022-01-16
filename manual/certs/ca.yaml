@@ -9,14 +9,14 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: my-ca
-  namespace: istio-system 
+  namespace: orthweb 
 spec:
   isCA: true
   commonName: my-ca
   secretName: ca-secret
   privateKey:
-    algorithm: ECDSA
-    size: 256
+    algorithm: RSA
+    size: 2048 
   issuerRef:
     name: selfsigned-issuer
     kind: ClusterIssuer
@@ -26,7 +26,7 @@ apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: my-ca-issuer
-  namespace: istio-system
+  namespace: orthweb 
 spec:
   ca:
     secretName: ca-secret

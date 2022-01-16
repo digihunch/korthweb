@@ -2,7 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: orthweb-cert
-  namespace: istio-system 
+  namespace: orthweb 
 spec:
   commonName: orthweb.com 
   secretName: orthweb-secret
@@ -15,8 +15,8 @@ spec:
     - web.orthweb.com
     - dicom.orthweb.com
   privateKey:
-    algorithm: ECDSA
-    size: 256
+    algorithm: RSA 
+    size: 2048 
   issuerRef:
     name: my-ca-issuer
     kind: Issuer

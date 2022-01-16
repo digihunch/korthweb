@@ -14,8 +14,8 @@ spec:
     - web.orthweb.com
     - dicom.orthweb.com
   privateKey:
-    algorithm: ECDSA
-    size: 256
+    algorithm: RSA 
+    size: 2048
   issuerRef:
     name: int-ca-issuer
     kind: Issuer

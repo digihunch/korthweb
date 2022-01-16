@@ -21,21 +21,23 @@ helm repo update
 ```
 Then we install components in the following sequence:
 ```sh
+kubectl create ns istio-system
+kubectl create ns orthweb
 # use base chart to install crds, then verify with "kubectl get crds"
-helm install -n istio-system istio-base istio/base --create-namespace
+helm install -n istio-system istio-base istio/base
 # use istiod chart to install istiod
-helm -n istio-system install istiod istio/istiod -f istiod-values.yaml --wait
+helm -n istio-system install istiod istio/istiod -f istio/istiod-values.yaml --wait
 # use gateway chart to install ingress gateway
-helm -n istio-system install istio-ingress istio/gateway -f ingress-gateway-values.yaml
+helm -n orthweb install istio-ingress istio/gateway -f istio/ingress-gateway-values.yaml
 # use gateway chart to install egress gateway
-helm -n istio-system install istio-egress istio/gateway -f egress-gateway-values.yaml
+helm -n orthweb install istio-egress istio/gateway -f istio/egress-gateway-values.yaml
 ```
 #### Configure DNS and addons
 The Ingress service is running on an IP address in the range specified above, which can be displayed with the following command:
 ```sh
-kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+kubectl -n orthweb get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 ```
-To assist the testing in the rest of the instruction, we can add it to local host file (e.g. /etc/hosts for Mac and Linux), for example:
+To assist the testing in the rest of the instruction, we can add the IP address to local host file (e.g. /etc/hosts for Mac and Linux), for example:
 ```
 192.168.64.16 web.orthweb.com
 192.168.64.16 dicom.orthweb.com
@@ -62,9 +64,13 @@ Then we create key, certificate and CA certificate into secrets for istio ingres
 kubectl apply -f certs/ca.yaml
 kubectl apply -f certs/site.yaml
 ```
-A secret named orthweb-secret is created in namespace istio-system. To view the certificate, parse and decode the secret:
+A secret named orthweb-secret is created in namespace istio-system. To view the certificate and export it, parse and decode the secret:
 ```sh
-openssl x509 -in <(kubectl -n istio-system get secret orthweb-secret -o jsonpath='{.data.ca\.crt}' | base64 -d) -text -noout
+openssl x509 -in <(kubectl -n orthweb get secret orthweb-secret -o jsonpath='{.data.ca\.crt}' | base64 -d) -text -noout
+
+kubectl -n orthweb get secret orthweb-secret -o jsonpath='{.data.ca\.crt}' | base64 -d > ca.crt
+
+keytool -import -alias orthweb.com -file ca.crt -storetype JKS -noprompt -keystore client.truststore -storepass Password123!
 ```
 
 ### Deploy database and application
@@ -80,7 +86,7 @@ helm install postgres-ha bitnami/postgresql-ha \
 Note that we provide SQL script (stored in orthanc-dbinit entry) to postgresql.initdbScriptsCM instead of pgpool.initdbScriptsCM because the altter doesn't take files with SQL extention, according to the [documentation](https://artifacthub.io/packages/helm/bitnami/postgresql-ha) of PostgreSQL helm chart.
 Monitor the service and deploy status until all Pods are up. It usually takes a couple minutes.
 ```sh
-kubectl get all -n orthweb
+kubectl -n orthweb get all
 ```
 It may take minutes before the PostgreSQL services coming up. Then we bring up application's Deployment and Service.
 ```sh
@@ -102,11 +108,11 @@ curl -HHost:web.orthweb.com -v -k -X GET https://web.orthweb.com:443/app/explore
 Then we use [dcm4chee](https://github.com/dcm4che/dcm4che/releases) to validate DICOM traffic. Before running C-ECHO, we first import the CA certificate to a trust store, with a password, say Password123!
 ```sh
 keytool -import -alias orthweb -file ca.crt -storetype JKS -keystore client.truststore
-storescu -c ORTHANC@dicom.orthweb.com:11112 --tls12 --tls-aes --trust-store path/to/client.truststore --trust-store-pass Password123!
+storescu -c ORTHANC@dicom.orthweb.com:11112 --tls12 --tls-aes --trust-store client.truststore --trust-store-pass Password123!
 ```
 We then use storescu (without a DCM file specified) as a C-ECHO SCU. If it returns success, we can C-STORE a DCM file:
 ```sh
-storescu -c ORTHANC@dicom.orthweb.com:11112 TEST.DCM --tls12 --tls-aes --trust-store path/to/client.truststore --trust-store-pass Password123!
+storescu -c ORTHANC@dicom.orthweb.com:11112 TEST.DCM --tls12 --tls-aes --trust-store client.truststore --trust-store-pass Password123!
 ```
 Once the DICOM file has been sent, and the C-STORE SCP returns success, the image should be viewable from browser. Any [sample](http://www.rubomedical.com/dicom_files/) DICOM image should work for this test case. 
 
