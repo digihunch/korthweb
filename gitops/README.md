@@ -19,15 +19,22 @@ flux bootstrap github \
     --repository=korthweb \
     --branch=main \
     --personal \
-    --path=gitops/environment/dev
+    --path=gitops/fluxcd
 ```
 A deployment key will be created as the bootstrapping is completed. The sync should start automatically as boostrapping is completed.
 
-To check sync status, run:
+To check sync progress by kusomization status, run:
 ```sh
-flux get kustomizations
+flux get ks
 ```
 For troubleshooting, in the flux-system namespace, check the CRD status.
 
 ## Validation
 Check out the [validation](https://github.com/digihunch/korthweb/blob/main/manual/README.md#validation) section for [manual](https://github.com/digihunch/korthweb/blob/main/manual/README.md) install. 
+
+```sh
+kubectl -n dev-orthweb get secret orthweb-secret -o jsonpath='{.data.ca\.crt}' | base64 --decode > ca.crt
+keytool -import -alias orthweb.com -file ca.crt -storetype JKS -noprompt -keystore client.truststore -storepass Password123!
+curl -HHost:web.dev.orthweb.com -v -k -X GET https://web.dev.orthweb.com:443/app/explorer.html -u orthanc:orthanc --cacert ca.crt
+storescu -c ORTHANC@dicom.dev.orthweb.com:11112 --tls12 --tls-aes --trust-store client.truststore --trust-store-pass Password123!
+```
