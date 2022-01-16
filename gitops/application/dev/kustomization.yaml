@@ -6,3 +6,44 @@ resources:
   - ../base/orthanc
 transformers:
   - labels.yaml
+patchesStrategicMerge:
+- |-
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: orthanc-app
+  data:
+    db.addr: postgres-ha-postgresql-ha-pgpool.orthweb.svc.cluster.local 
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/servers/0/hosts
+        value:
+        - dicom.dev.orthweb.com
+    target:
+      kind: Gateway
+      name: dcm-gw
+  - patch: |-
+      - op: replace
+        path: /spec/servers/0/hosts
+        value:
+        - web.dev.orthweb.com
+    target:
+      kind: Gateway
+      name: web-gw
+  - patch: |-
+      - op: replace
+        path: /spec/hosts
+        value:
+        - dicom.dev.orthweb.com
+    target:
+      kind: VirtualService 
+      name: dcm-vs
+  - patch: |-
+      - op: replace
+        path: /spec/hosts
+        value:
+        - web.dev.orthweb.com
+    target:
+      kind: VirtualService
+      name: web-vs
