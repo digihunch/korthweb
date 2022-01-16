@@ -18,21 +18,21 @@ spec:
     - apiVersion: apps/v1
       kind: Deployment
       name: postgres-ha-postgresql-ha-pgpool
-      namespace: dev-orthweb
+#      namespace: dev-orthweb
     - apiVersion: cert-manager.io/v1
       kind: Certificate
       name: orthweb-cert
-      namespace: dev-orthweb
+#      namespace: dev-orthweb
     - apiVersion: helm.toolkit.fluxcd.io/v2beta1 
       kind: HelmRelease
       name: istio-egress
-      namespace: dev-orthweb
+#      namespace: dev-orthweb
     - apiVersion: helm.toolkit.fluxcd.io/v2beta1 
       kind: HelmRelease
       name: istio-ingress
-      namespace: dev-orthweb
+#      namespace: dev-orthweb
     - apiVersion: helm.toolkit.fluxcd.io/v2beta1
       kind: HelmRelease
       name: postgres-ha 
-      namespace: dev-orthweb
+#      namespace: dev-orthweb
  
