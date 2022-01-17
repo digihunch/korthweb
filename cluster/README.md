@@ -3,14 +3,14 @@
 We need a Kubernetes cluster as the platform to run Orthanc workload. Depending on your requirement, consider the following options for Kubernetes cluster:
 | Use case | Description | How to create |
 |--|--|--|
-| Playground | Multi-node cluster on single machine to start instantly for POC.| Pick a technology depending on your OS. This project is tested with Minikube on MacOS.  |
+| Playground | Multi-node cluster on single machine to start instantly for POC.| Pick a tool for local multi-node cluster depending on your OS. The tests in this project is developed with Minikube on MacOS.  |
 | Staging | Multi-node cluster on public cloud platform such as EKS on AWS, AKS on Azure or GKE on GCP. | CLI tools by the cloud vendor can typically handle this level of complexity. Working instructions are provided for reference in the [cluster](https://github.com/digihunch/korthweb/blob/main/cluster/README.md)  directory of this project. |
-| Professional | Clusters on private networks in public cloud or private platform for test and production environments.  | The cluster infrastructure should be managed as IaC (Infrastructure as Code) specific to your environment. Reference implementation provided in [CloudKube](https://github.com/digihunch/cloudkube) project. Contact [DigiHunch](https://www.digihunch.com/contact/) for professional service to customize the cluster.|
+| Professional | Clusters on private networks in public cloud or private platform for test and production environments.  | The cluster infrastructure should be managed as IaC (Infrastructure as Code). [DigiHunch](https://www.digihunch.com/contact/) has vallina K8 cluster provided in [CloudKube](https://github.com/digihunch/cloudkube) project. For customization contact professional service.|
 
 ## Create a playground cluster 
 A playground cluster can usually be created on a MacBook or PC, with a tool of choice to create multi-node Kubernetes cluster locally. For more details, check out [this post](https://www.digihunch.com/2021/09/single-node-kubernetes-cluster-minikube/) . 
 ### Minikube
-Minikube is recommended
+Minikube is recommended for MacOS and Windows.
 1. Install hypberkit and minikube with HomeBrew
 2. Create a cluster with three nodes.
 ```sh
@@ -30,8 +30,8 @@ To destroy the cluster, run:
 minikube stop && minikube delete
 ```
 ### Kind
-Kind can be used on MacOS. it doesn't have docker0 bridge on Windows/WSL2, making it an unfavourable choice for Windows.
-1. Install [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries) on WSL2, and go to cluster directory of this repo.
+Kind can be used on MacOS. On Windows/WSL2, it doesn't have docker0 bridge on Windows/WSL2, making it an unfavourable choice.
+1. Install [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries), and go to cluster directory of this repo.
 2. Create cluster with cluster.yaml as input
 ```sh
 kind create cluster --config=kind-config.yaml
