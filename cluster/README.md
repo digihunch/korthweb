@@ -67,7 +67,16 @@ eksctl delete cluster -f cluster.yaml --profile default
 ### AKS
 To create a cluster, assuming resource group name is AutomationTest, and cluster name is orthCluster
 ```sh
-az aks create -g AutomationTest -n orthCluster --node-count 3 --enable-addons monitoring --generate-ssh-keys --tags Owner=MyOwner
+az aks create \
+   -g AutomationTest \
+   -n orthCluster \
+   --node-count 3 \
+   --enable-addons monitoring \
+   --generate-ssh-keys \
+   --vm-set-type VirtualMachineScaleSets \
+   --network-plugin azure \
+   --network-policy calico \
+   --tags Owner=MyOwner
 ```
 Then we can update local kubectl context with the following command:
 ```sh
