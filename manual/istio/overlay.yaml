@@ -1,7 +1,7 @@
 apiVersion: install.istio.io/v1alpha2
 kind: IstioControlPlane
 metadata:
-  namespace: istio-operator
+  namespace: istio-system
   name: custom-istiocontrolplane
 spec:
   profile: default
