@@ -37,5 +37,6 @@ spec:
       retries: 3
   values:
     meshConfig:
+      accessLogFile: /dev/stdout
       outboundTrafficPolicy:
         mode: REGISTRY_ONLY

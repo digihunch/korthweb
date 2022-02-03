@@ -52,3 +52,12 @@ patches:
     target:
       kind: VirtualService
       name: web-vs
+  - patch: |-
+      - op: add
+        path: /spec/rules/0/from/0/source/notNamespaces
+        value:
+        - istio-system
+        - tst-orthweb
+    target:
+      kind: AuthorizationPolicy
+      name: http-authz-policy

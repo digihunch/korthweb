@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - web-ingress.yaml
   - dicom-ingress.yaml
+  - http-authz-policy.yaml

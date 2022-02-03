@@ -1,0 +1,13 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: http-authz-policy 
+spec:
+  action: DENY
+  rules:
+  - from:
+    - source:
+        notNamespaces: ["istio-system"]
+    to:
+    - operation:
+        notMethods: ["GET","POST","PUT","HEAD","DELETE"]
