@@ -4,4 +4,3 @@ namespace: istio-system
 resources:
 - namespace.yaml
 - release.yaml
-- resource.yaml
