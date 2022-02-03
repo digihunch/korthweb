@@ -17,6 +17,8 @@ spec:
     remediation:
       retries: 3
   values:
+    commonLabels:
+      app: postgresdb
     volumePermissions:
       enabled: true
     postgresql:

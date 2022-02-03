@@ -3,6 +3,9 @@ kind: AuthorizationPolicy
 metadata:
   name: http-authz-policy 
 spec:
+  selector:
+    matchLabels:
+      app: orth
   action: DENY
   rules:
   - from:

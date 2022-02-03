@@ -4,8 +4,6 @@ resources:
   - service.yaml 
   - deployment.yaml
   - hpa.yaml
-#  - web-ingress.yaml
-#  - dicom-ingress.yaml
 configMapGenerator:
 - name: orthanc-app
   files:
