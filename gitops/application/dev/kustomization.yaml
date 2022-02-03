@@ -4,6 +4,7 @@ namespace: dev-orthweb
 resources:
   - namespace.yaml
   - ../base/orthanc
+  - ../base/ingress
 transformers:
   - labels.yaml
 images:
