@@ -1,0 +1,40 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: authz-policy-orthanc
+spec:
+  selector:
+    matchLabels:
+      app: orth
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        namespaces: ["istio-system","orthweb"]
+    to:
+    - operation:
+        methods: ["GET","POST","PUT","HEAD","DELETE"]
+        ports: ["8042"]
+  - from:
+    - source:
+        namespaces: ["istio-system","orthweb"]
+    to:
+    - operation:
+        ports: ["4242"]
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: authz-policy-postgres 
+spec:
+  selector:
+    matchLabels:
+      app: postgresdb
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        namespaces: ["orthweb"]
+    to:
+    - operation:
+        ports: ["5432"]

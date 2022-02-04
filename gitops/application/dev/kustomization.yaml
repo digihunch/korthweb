@@ -4,7 +4,7 @@ namespace: dev-orthweb
 resources:
   - namespace.yaml
   - ../base/orthanc
-  - ../base/ingress
+  - ../base/istio-crd
 transformers:
   - labels.yaml
 images:
@@ -20,44 +20,61 @@ patchesStrategicMerge:
   data:
     db.addr: postgres-ha-postgresql-ha-pgpool.dev-orthweb.svc.cluster.local 
 patches:
-  - patch: |-
-      - op: replace
-        path: /spec/servers/0/hosts
-        value:
-        - dicom.dev.orthweb.com
-    target:
+  - target:
       kind: Gateway
       name: dcm-gw
-  - patch: |-
+    patch: |-
+      - op: replace
+        path: /spec/servers/0/hosts
+        value:
+        - dicom.dev.orthweb.com
+  - target:
+      kind: Gateway
+      name: web-gw
+    patch: |-
       - op: replace
         path: /spec/servers/0/hosts
         value:
         - web.dev.orthweb.com
-    target:
-      kind: Gateway
-      name: web-gw
-  - patch: |-
+  - target:
+      kind: VirtualService 
+      name: dcm-vs
+    patch: |-
       - op: replace
         path: /spec/hosts
         value:
         - dicom.dev.orthweb.com
-    target:
-      kind: VirtualService 
-      name: dcm-vs
-  - patch: |-
+  - target:
+      kind: VirtualService
+      name: web-vs
+    patch: |-
       - op: replace
         path: /spec/hosts
         value:
         - web.dev.orthweb.com
-    target:
-      kind: VirtualService
-      name: web-vs
-  - patch: |-
+  - target:
+      kind: AuthorizationPolicy
+      name: authz-policy-orthanc
+    patch: |-
       - op: add
-        path: /spec/rules/0/from/0/source/notNamespaces
+        path: /spec/rules/0/from/0/source/namespaces
         value:
         - istio-system
         - dev-orthweb 
-    target:
+  - target:
       kind: AuthorizationPolicy
-      name: http-authz-policy
+      name: authz-policy-orthanc 
+    patch: |-
+      - op: add
+        path: /spec/rules/1/from/0/source/namespaces
+        value: 
+        - istio-system
+        - dev-orthweb
+  - target:
+      kind: AuthorizationPolicy
+      name: authz-policy-postgres 
+    patch: |-
+      - op: add
+        path: /spec/rules/0/from/0/source/namespaces
+        value: 
+        - dev-orthweb
