@@ -23,7 +23,8 @@ spec:
       enabled: true
     postgresql:
       initdbScriptsCM: dbinit
-      podLabels: postgresdb
+      podLabels: 
+        app: postgresdb
     pgpool:
       tls:
         enabled: false
