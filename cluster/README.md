@@ -8,13 +8,13 @@ We need a Kubernetes cluster as the platform to run Orthanc workload. Depending 
 | Professional | Clusters on private networks in public cloud or private platform for test and production environments.  | The cluster infrastructure should be managed as IaC (Infrastructure as Code). [DigiHunch](https://www.digihunch.com/contact/) has vallina K8 cluster provided in [CloudKube](https://github.com/digihunch/cloudkube) project. For customization contact professional service.|
 
 ## Create a playground cluster 
-A playground cluster can usually be created on a MacBook or PC, with a tool of choice to create multi-node Kubernetes cluster locally. For more details, check out [this post](https://www.digihunch.com/2021/09/single-node-kubernetes-cluster-minikube/) . 
+A playground cluster can usually be created on a MacBook or PC, with a tool of choice to create multi-node Kubernetes cluster locally. For more details, check out [this post](https://www.digihunch.com/2021/09/single-node-kubernetes-cluster-minikube/). I recommend Minikube for this. 
 ### Minikube
-Minikube is recommended for MacOS and Windows.
+Minikube is recommended for MacOS and Windows. The instruction below was tested on MacOS.
 1. Install hypberkit and minikube with HomeBrew
 2. Create a cluster with three nodes.
 ```sh
-minikube start --memory=12288 --cpus=6 --kubernetes-version=v1.20.2 --nodes 3 --container-runtime=containerd --driver=hyperkit --disk-size=150g
+minikube start --memory=12288 --cpus=6 --kubernetes-version=v1.20.2 --nodes 3 --container-runtime=containerd --driver=hyperkit --disk-size=150g --network-plugin=cni --cni=calico
 minikube addons enable metallb
 minikube addons configure metallb
 ```
@@ -30,7 +30,7 @@ To destroy the cluster, run:
 minikube stop && minikube delete
 ```
 ### Kind
-Kind can be used on MacOS. On Windows/WSL2, it doesn't have docker0 bridge on Windows/WSL2, making it an unfavourable choice.
+Kind can be used on MacOS. Although Kind works on Windows/WSL2, it doesn't have docker0 bridge on Windows/WSL2, so it is not recommended.
 1. Install [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries), and go to cluster directory of this repo.
 2. Create cluster with cluster.yaml as input
 ```sh
@@ -103,4 +103,4 @@ gcloud container clusters delete orthcluster
 ```
 
 ## Create a production cluster
-Production cluster requires some effort to design and implmenet. A good start point is the [CloudKube](https://github.com/digihunch/cloudkube) project. Alternatively, get professional service from [Digi Hunch](https://www.digihunch.com/contact/). 
+Production cluster requires some effort to design and implmenet. A good start point is the [CloudKube](https://github.com/digihunch/cloudkube) project. Alternatively, contact [Digi Hunch](https://www.digihunch.com/contact/) for professional service. 

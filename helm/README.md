@@ -1,5 +1,5 @@
 # Deploy Orthanc as Helm Chart
-In this approach, we deploy Orthanc with a single command, using the purpose-built Orthanc Helm Chart stored in the *orthanc* sub-directory. Currently, this chart is not released and the content is stored in the local sub-directory. Therefore, we need to clone this repo first and enter the helm directory. Then we can update dependency and install the chart:
+In this approach, we deploy Orthanc with a single command, using the purpose-built Orthanc Helm Chart stored in the *orthanc* sub-directory. This chart is not released in a public Helm Repository. The content is simply stored in the local sub-directory. In order to deploy, we need to clone this repo first and enter the helm directory. Then we update dependency and install the chart:
 ```sh
 $ git clone git@github.com:digihunch/korthweb.git
 $ cd korthweb/helm
