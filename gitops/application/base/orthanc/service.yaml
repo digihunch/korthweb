@@ -13,7 +13,7 @@ spec:
       protocol: TCP
       port: 4242
       targetPort: 4242
-    - name: http
+    - name: http    # it is important to name this port http, which will tell istio's authorization policy that traffic should be treated as HTTP and rules based on HTTP method will take effect. Otherwise, HTTP-based rules won't take effect, causing no rules to match and authorization denied.
       protocol: TCP
       port: 8042
       targetPort: 8042
