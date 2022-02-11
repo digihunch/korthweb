@@ -14,7 +14,7 @@ Minikube is recommended for MacOS and Windows. The instruction below was tested 
 1. Install hypberkit and minikube with HomeBrew
 2. Create a cluster with three nodes.
 ```sh
-minikube start --memory=12288 --cpus=6 --kubernetes-version=v1.20.2 --nodes 3 --container-runtime=containerd --driver=hyperkit --disk-size=150g --network-plugin=cni --cni=calico
+minikube start --memory=12288 --cpus=6 --kubernetes-version=v1.20.2 --nodes 3 --container-runtime=containerd --driver=hyperkit --disk-size=150g
 minikube addons enable metallb
 minikube addons configure metallb
 ```
