@@ -21,7 +21,7 @@ patchesStrategicMerge:
     db.addr: postgres-ha-postgresql-ha-pgpool.tst-orthweb.svc.cluster.local 
 replicas:
 - name: orthanc
-  count: 7
+  count: 3
 patches:
   - target:
       kind: Gateway
