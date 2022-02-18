@@ -14,7 +14,7 @@ spec:
       version: "1.0.3"
   interval: 5m0s
   test:
-    enabled: true
+    enable: true
   install:
     remediation:
       retries: 3
