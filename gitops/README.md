@@ -54,9 +54,10 @@ kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/ad
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/grafana.yaml
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/prometheus.yaml
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/kiali.yaml
+istioctl dashboard kiali
 kubectl -n istio-system port-forward svc/kiali 8080:20001
 ```
-Kiali should be exposed on localhost:8080.
+The istioctl command should launch browser to Kiali page. Or alternatively use port-forward to expose kiali service.
 
 ## Troubleshoot
 
