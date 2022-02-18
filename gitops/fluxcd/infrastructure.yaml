@@ -24,3 +24,7 @@ spec:
       kind: HelmRelease
       name: istiod
       namespace: istio-system
+    - apiVersion: v1
+      kind: Service
+      name: cert-manager-webhook
+      namespace: cert-manager

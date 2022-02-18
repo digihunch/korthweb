@@ -12,7 +12,9 @@ spec:
         name: jetstack
         namespace: flux-system
       version: "1.0.3"
-  interval: 1h0m0s
+  interval: 5m0s
+  test:
+    enabled: true
   install:
     remediation:
       retries: 3
