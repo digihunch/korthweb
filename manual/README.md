@@ -69,7 +69,8 @@ $ helm repo add bitnami https://charts.bitnami.com/bitnami
 $ helm install postgres-ha bitnami/postgresql-ha \
        --namespace orthweb \
        --set postgresql.initdbScriptsCM=dbinit \
-       --set volumePermissions.enabled=true
+       --set volumePermissions.enabled=true \ 
+       --set service.portName=tcp-postgresql
 $ kubectl apply -f orthweb-workload.yaml
 ```
 Note that we provide SQL script (stored in orthanc-dbinit entry) to postgresql.initdbScriptsCM instead of pgpool.initdbScriptsCM because the latter doesn't take files with SQL extention, according to the [documentation](https://artifacthub.io/packages/helm/bitnami/postgresql-ha) for PostgreSQL helm chart.

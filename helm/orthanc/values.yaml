@@ -104,6 +104,8 @@ postgresql-ha:
       certFilename: tls.crt
       certKeyFilename: tls.key
       #certCAFilename: ca.crt # configuring this will require client to precent its cert for verification.
+  service:
+    portName: tcp-postgresql
 
 traefik:
   enabled: true
