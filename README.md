@@ -1,16 +1,16 @@
 # Korthweb - Orthanc deployment on Kubernetes
-Korthweb project provides different approaches to automatically deploy [Orthanc](https://www.orthanc-server.com/) on Kubernetes. Orthanc is an open-source application to ingest, store, display and distribute medical images. Korthweb is a sister project of [Orthweb](https://github.com/digihunch/orthweb), an deployment automation project for Orthanc on AWS EC2. 
+Korthweb project provides two approaches to automatically deploy [Orthanc](https://www.orthanc-server.com/) on Kubernetes. Orthanc is an open-source application to ingest, store, display and distribute medical images. Korthweb is a sister project of [Orthweb](https://github.com/digihunch/orthweb), an deployment automation project for Orthanc on AWS EC2. 
 
 ## Kubernetes Cluster
-Regardless of deployment approach, we need a Kubernetes cluster. If you do not have one already, refer to the instruction in the *[cluster](https://github.com/digihunch/korthweb/tree/main/cluster)* directory to build one first. A simple cluster as a playground only takes with a couple commands to create.
+For this project, we need a Kubernetes cluster. If you need guidance, refer to the instruction in the *[cluster](https://github.com/digihunch/korthweb/tree/main/cluster)* directory to build one first. A simple cluster as a playground only takes a couple commands to create.
 
 ## Deployment Approach
-In this project we explore three approaches for Orthanc deployment. Each is stored its own sub-directory with their respective instruction. The table below is a summary:
+In this project we explore two approaches for Orthanc deployment, along with a manual approach. Files required for each approach are stored in their own sub-directory with their instructions. The table below is an overview:
 | Approach | Components | Summary |
 |--|--|--|
-| [GitOps](https://github.com/digihunch/korthweb/tree/main/gitops) | - Istio CRD Ingress <br> - Istio Service Mesh <br> - PostgreSQL <br> - Cert-Manager<br> - Multi-tenancy| - YAML manifests required for GitOps-based automated deployment using FluxCD. <br> - Take this approach for complete feature set with a powerful deployment workflow. <br> - Two environments (dev and tst) are deployed.
-| [Helm Chart](https://github.com/digihunch/korthweb/tree/main/helm) | - Traefik CRD Ingress <br> - PostgreSQL | - Helm chart to configure Orthanc and its dependencies with a single command. <br> - Take this approach for simplicity with essential features.
-| [Manual](https://github.com/digihunch/korthweb/tree/main/manual) | - Istio CRD Ingress <br> - Istio Service Mesh <br> - PostgreSQL <br> - Cert-Manager | - YAML manifests for all required resources for users to manually apply. <br> - Take this approach ONLY for troubleshooting or learning. |
+| [GitOps](https://github.com/digihunch/korthweb/tree/main/gitops) | - Istio CRD Ingress <br> - Istio Service Mesh <br> - PostgreSQL <br> - Cert-Manager<br> - Multi-tenancy| - Includes YAML manifests required for GitOps-based automated deployment using FluxCD. <br> - Take this approach for complete feature set with a powerful deployment workflow. <br> - Two environments (dev and tst) are deployed.
+| [Helm Chart](https://github.com/digihunch/korthweb/tree/main/helm) | - Traefik CRD Ingress <br> - PostgreSQL | - Includes the Helm chart to configure Orthanc and its dependencies with a single command. <br> - Take this approach for simplicity with essential features.
+| [Manual](https://github.com/digihunch/korthweb/tree/main/manual) | - Istio CRD Ingress <br> - Istio Service Mesh <br> - PostgreSQL <br> - Cert-Manager | - Includes YAML manifests for all required resources for users to manually apply. <br> - Take this approach ONLY for troubleshooting or learning. |
 
 For detailed instructions, go to the sub-directory named after the intended approach. Depending on the approach, the following tools need to be installed:
 * [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl): connect to API server to manage the Kubernetes cluster. With multiple clusters, you need to [switch context](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/).
@@ -21,9 +21,9 @@ For detailed instructions, go to the sub-directory named after the intended appr
 ## Architectural Considerations
 This section discusses the choice of deployment patterns and tools. 
 ### Database
-Although Orthanc supports multiple choices of database backends, this deployment project is based on PostgreSQL database. If the Kubernetes platform is hosted in a public cloud environment, you can configure Orthanc to use other database backend provided as managed database services.
+Orthanc supports many kinds of database backends. This deployment project is built on PostgreSQL database only, and it includes installing PostgreSQL database in HA. However, if the Kubernetes platform is hosted in a public cloud environment, it is almost always preferable to host database as managed services provided by the platform. Hosting database (stateful workload) within Kubernetes can be uncessarily involving.
 ### Ingress Gateway
-The orthanck container uses TCP port 8042 for web traffic, and TCP port 4242 for DICOM traffic. In Kubernetes, we use ingress to expose both ports (443 for web and 11112 for DICOM) for TLS termination and load balancing across Pods. So we need an Ingress controller that can proxy both HTTP and TCP traffic, as well as perform TLS termination.
+The Orthanc container uses TCP port 8042 for web traffic, and TCP port 4242 for DICOM traffic. In Kubernetes, we use ingress to expose both ports (443 for web and 11112 for DICOM) for TLS termination and load balancing across Pods. So we need an Ingress controller that can proxy both HTTP and TCP traffic, as well as perform TLS termination.
 
 In the Helm approach, we use [Traefik](https://doc.traefik.io/traefik/routing/providers/kubernetes-crd/) CRD for this requirement. Both the GitOps and Manual approaches come with Istio service mesh so we simply use the Istio provided Gateways to satisfy the same requirement. I did not include Istio service mesh in the Helm approach because Istio's Helm chart is still maturing in Jan 2022 and I don't want to make my Helm Chart overly complicated. In GitOps and Manual approaches, I did not use Traefik because Istio already provides the needed gateway function. 
 
@@ -47,4 +47,6 @@ The GitOps approach is more flexible than the Helm approach and can accomodate m
 ```sh
 kubectl -n orthweb get secret orthweb-secret -o jsonpath='{.data.ca\.crt}' | base64 --decode > ca.crt
 ```
-For BYO certificates or integration with existing PKI workflow, you need to customize this deployment, or contact [Digi Hunch](https://www.digihunch.com/) for professional services. 
+In production, you may bring your own certificates or integration with existing PKI workflow.
+
+For deployment customization, you may contact [Digi Hunch](https://www.digihunch.com/) for professional services. 

@@ -46,18 +46,20 @@ $ keytool -import -alias orthweb.com -file ca.tst.crt -storetype JKS -noprompt -
 $ curl -HHost:web.tst.orthweb.com -v -k -X GET https://web.tst.orthweb.com/app/explorer.html -u orthanc:orthanc --cacert ca.tst.crt
 $ storescu -c ORTHANC@dicom.tst.orthweb.com:11112 --tls12 --tls-aes --trust-store client.tst.truststore --trust-store-pass Password123!
 ```
-To test C-STORE, use the storescu command with a dcm file as an additional argument. C-STORE tests database connectivity.
+To test C-STORE, use the storescu command with a dcm file as an additional argument. C-STORE will also test database write. C-STORE should come successful with a status code of 0 in C-STORE-RSP.
 
 To check Pod logs, use Kiali. Kiali should be configured and exposed via a virtual service. For a quick install, apply the following manifests
 ```sh
-kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/jaeger.yaml
-kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/grafana.yaml
-kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/prometheus.yaml
-kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/kiali.yaml
-istioctl dashboard kiali
-kubectl -n istio-system port-forward svc/kiali 8080:20001
+$ kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/jaeger.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/grafana.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/prometheus.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/kiali.yaml
+$ istioctl dashboard kiali
 ```
 The istioctl command should launch browser to Kiali page. Or alternatively use port-forward to expose kiali service.
+```sh
+kubectl -n istio-system port-forward svc/kiali 8080:20001
+```
 
 ## Troubleshoot
 
