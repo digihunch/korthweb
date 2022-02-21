@@ -2,7 +2,7 @@
 Korthweb project provides two approaches to automatically deploy [Orthanc](https://www.orthanc-server.com/) on Kubernetes. Orthanc is an open-source application to ingest, store, display and distribute medical images. Korthweb is a sister project of [Orthweb](https://github.com/digihunch/orthweb), an deployment automation project for Orthanc on AWS EC2. 
 
 ## Kubernetes Cluster
-For this project, we need a Kubernetes cluster. If you need guidance, refer to the instruction in the *[cluster](https://github.com/digihunch/korthweb/tree/main/cluster)* directory to build one first. A simple cluster as a playground only takes a couple commands to create.
+For this project, we need a Kubernetes cluster. If you need guidance, refer to *[real-quicK-cluster](https://github.com/digihunch/real-quicK-cluster)* project to provision one. A simple cluster as a playground only takes a couple commands to create.
 
 ## Deployment Approach
 In this project we explore two approaches for Orthanc deployment, along with a manual approach. Files required for each approach are stored in their own sub-directory with their instructions. The table below is an overview:

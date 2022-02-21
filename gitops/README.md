@@ -1,6 +1,8 @@
 # Deploy Orthanc with GitOps using FluxCD
 
-GitOps is the recommended approach to deploy Orthanc automatically. We use FluxCD as the GitOps tool. This approach also deploys Orthanc workload with two environments (dev and tst). At the end of deployment two instances are deployed, in the dev-orthweb and tst-orthweb namespaces.
+GitOps is the recommended approach to deploy Orthanc automatically. We use FluxCD as the GitOps tool. This approach also deploys Orthanc workload with two environments (dev and tst). At the end of deployment two instances are deployed, in the dev-orthweb and tst-orthweb namespaces, as illustrated below:
+
+![Diagram](resources/korthweb-gitops.png)
 
 To work with this approach, we need a Kubernetes cluster, helm, kubectl and flux, and ensures that local kubectl connects to the cluster.
 ## Preparation
