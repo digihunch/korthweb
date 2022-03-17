@@ -18,5 +18,6 @@ spec:
   install:
     remediation:
       retries: 3
+      ignoreTestFailures: true #https://github.com/cert-manager/cert-manager/issues/2908
   values:
     installCRDs: true
