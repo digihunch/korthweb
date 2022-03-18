@@ -1,12 +1,27 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
 metadata:
+  name: dev-namespace
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  dependsOn:
+    - name: infrastructure
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./gitops/namespace/dev
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
   name: dev-dependency 
   namespace: flux-system
 spec:
   interval: 10m0s
   dependsOn:
     - name: infrastructure
+    - name: dev-namespace
   sourceRef:
     kind: GitRepository
     name: flux-system
