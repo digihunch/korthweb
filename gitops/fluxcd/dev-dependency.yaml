@@ -7,7 +7,6 @@ spec:
   interval: 10m0s
   dependsOn:
     - name: infrastructure
-    - name: dev-namespace
   sourceRef:
     kind: GitRepository
     name: flux-system
