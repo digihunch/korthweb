@@ -8,16 +8,18 @@ This manual approach uses external Helm Chart for dependencies (Istio, Cert-Mana
 ## Install Istio
 
 There are two methods to install Istio, using the files in the *[istio](https://github.com/digihunch/korthweb/tree/main/manual/istio)* directory. 
-### Method 1. Using istioctl with overlay file
+### Method 1. Using istioctl with IstioOperatorAPI file
 We use istioctl command-line tool (following [official guide](https://istio.io/latest/docs/setup/install/istioctl/#prerequisites)) with the provided overlay file for our customization: 
 ```sh
-istioctl install -f overlay.yaml -y --verify
+istioctl install -f istio-operator.yaml -y --verify
 ```
 The stdout at the end of installation may report "no Istio installation found" which is not a concern. 
 ### Method 2. Using Helm Chart
 Since Nov 2021, Istio has released offical Helm [Charts](https://artifacthub.io/packages/search?org=istio) for different Istio components. The Helm Repo should be registered first:
 ```sh
 helm repo add istio https://istio-release.storage.googleapis.com/charts
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add kiali https://kiali.org/helm-charts
 helm repo update
 ```
 Then in the following order, we create namespaces and install required Isto components:
@@ -33,16 +35,28 @@ helm -n orthweb install istio-ingress istio/gateway -f istio/ingress-gateway-val
 # use gateway chart to install egress gateway
 helm -n orthweb install istio-egress istio/gateway -f istio/egress-gateway-values.yaml
 ```
-If Istio addons are needed (such as Kiali), we can install them using the manifests from the installer:
+To install observability addons (prometheus, grafana and kiali)
 ```sh
-kubectl apply -f istio/samples/addons/prometheus.yaml
-kubectl apply -f istio/samples/addons/kiali.yaml
-kubectl apply -f istio/samples/addons/jaeger.yaml
-kubectl apply -f istio/samples/addons/grafana.yaml
+helm install prom prometheus-community/kube-prometheus-stack --version 34.1.1 -n monitoring -f monitoring/prom-values.yaml --create-namespace
+
+kubectl apply -f monitoring/service-monitor-cp.yaml
+kubectl apply -f monitoring/pod-monitor-dp.yaml
+
+kubectl -n monitoring create cm istio-dashboards \
+--from-file=pilot-dashboard.json=monitoring/dashboards/pilot-dashboard.json \
+--from-file=istio-workload-dashboard.json=monitoring/dashboards/istio-workload-dashboard.json \
+--from-file=istio-service-dashboard.json=monitoring/dashboards/istio-service-dashboard.json \
+--from-file=istio-performance-dashboard.json=monitoring/dashboards/istio-performance-dashboard.json \
+--from-file=istio-mesh-dashboard.json=monitoring/dashboards/istio-mesh-dashboard.json \
+--from-file=istio-extension-dashboard.json=monitoring/dashboards/istio-extension-dashboard.json
+
+kubectl label -n monitoring cm istio-dashboards grafana_dashboard=1
+
+helm install --namespace operator kiali-operator  kiali/kiali-operator --create-namespace -f monitoring/kiali-value.yaml
 ```
 To launch kiali from Minikube, run:  
 ```sh
-$ istioctl dashboard kiali
+$ kubectl port-forward svc/kiali -n monitoring 8080:20001
 ```
 
 ## Configure certificates

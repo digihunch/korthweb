@@ -1,0 +1,58 @@
+apiVersion: install.istio.io/v1alpha2
+kind: IstioOperator
+metadata:
+  name: istio-operator
+spec:
+  profile: default
+  hub: docker.io/istio
+  tag: 1.13.2
+  namespace: istio-system
+  meshConfig:
+    accessLogFile: /dev/stdout
+    outboundTrafficPolicy:
+      mode: "REGISTRY_ONLY"
+  components:
+    pilot:
+      k8s:
+        hpaSpec:
+          maxReplicas: 7
+          minReplicas: 1
+        nodeSelector:
+          beta.kubernetes.io/os: linux
+    ingressGateways:
+    - name: istio-ingressgateway
+      enabled: true
+      label:
+        istio: ingressgateway
+      k8s:
+        hpaSpec:
+          maxReplicas: 11
+          minReplicas: 1
+        serviceAnnotations:
+          service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+          service.beta.kubernetes.io/azure-load-balancer-internal-subnet: "my-lb-subnet-if-on-aks"
+        service:
+          ports:
+          - name: status-port
+            nodePort: 30921
+            port: 15021
+            protocol: TCP
+            targetPort: 15020
+          - name: http2
+            nodePort: 30766
+            port: 80
+            protocol: TCP
+            targetPort: 8080
+          - name: https
+            nodePort: 30850
+            port: 443
+            protocol: TCP
+            targetPort: 8443
+          - name: dicom
+            nodePort: 30476
+            port: 11112
+            protocol: TCP
+            targetPort: 4242
+    egressGateways:
+    - name: istio-egressgateway
+      enabled: true

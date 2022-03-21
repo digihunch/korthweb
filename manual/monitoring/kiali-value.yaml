@@ -1,0 +1,31 @@
+cr:
+  create: true
+  name: kiali-cr
+  namespace: monitoring
+  spec:
+    istio_namespace: "istio-system"
+    istio_component_namespaces:
+      prometheus: monitoring
+    auth:
+      strategy: anonymous
+    deployment:
+      accessible_namespaces:
+      - '**'
+      ingress_enabled: false
+    external_services:
+      prometheus:
+        cache_duration: 10
+        cache_enabled: true
+        url: "http://prom-kube-prometheus-stack-prometheus.monitoring:9090"
+      grafana:
+        enabled: true
+        auth:
+          type: "basic"
+          username: "admin"
+          password: "prom-operator"
+        in_cluster_url: "http://prom-grafana.monitoring:80"
+        url: "http://prom-grafana.monitoring:80"
+      server:
+        web_root: "/kiali"
+      tracing:
+        enabled: false

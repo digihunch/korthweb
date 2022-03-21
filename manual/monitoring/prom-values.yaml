@@ -1,0 +1,35 @@
+alertmanager:
+  enabled: false
+coreDns:
+  enabled: false
+defaultRules:
+  create: false
+kubeApiServer:
+  enabled: false
+kubeEtcd:
+  enabled: false
+kubeProxy:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeStateMetrics:
+  enabled: false
+kubelet:
+  enabled: false
+nodeExporter:
+  enabled: false
+pushgateway:
+  enabled: false
+prometheusOperator:
+  configReloaderCpu: 100m
+  configReloaderMemory: 50Mi
+  prometheusConfigReloaderImage:
+    repository: quay.io/prometheus-operator/prometheus-config-reloader
+server:
+  global:
+    scrape_interval: 15s
+  persistentVolume:
+    enabled: false
+  readinessProbeInitialDelay: 0
+  service:
+    servicePort: 9090
