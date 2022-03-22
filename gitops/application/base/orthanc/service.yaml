@@ -9,7 +9,7 @@ spec:
   selector:
     app: orth
   ports:
-    - name: dicom
+    - name: tcp-dicom
       protocol: TCP
       port: 4242
       targetPort: 4242

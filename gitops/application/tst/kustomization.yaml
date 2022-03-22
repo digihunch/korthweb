@@ -4,7 +4,7 @@ namespace: tst-orthweb
 resources:
   - namespace.yaml
   - ../base/orthanc
-  - ../base/istio-crd
+  - ../base/route
 transformers:
   - labels.yaml
 images:

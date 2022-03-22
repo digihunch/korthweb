@@ -13,4 +13,8 @@ spec:
   path: ./gitops/observability
   prune: true
   validation: client
-#  healthChecks:
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: kiali 
+      namespace: monitoring 

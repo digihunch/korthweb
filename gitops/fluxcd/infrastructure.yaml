@@ -28,3 +28,11 @@ spec:
       kind: Service
       name: cert-manager-webhook
       namespace: cert-manager
+    - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+      kind: HelmRelease
+      name: prometheus
+      namespace: monitoring
+    - apiversion: apps/v1
+      kind: Deployment
+      name: prom-grafana
+      namespace: monitoring

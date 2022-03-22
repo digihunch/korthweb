@@ -8,7 +8,7 @@ spec:
   servers:
   - port:
       number: 11112
-      name: dicom
+      name: tls-dicom
       protocol: TLS
     hosts:
     - "dicom.orthweb.com"
@@ -31,3 +31,4 @@ spec:
         host: orthweb # service label
         port:
           number: 4242
+      weight: 100
