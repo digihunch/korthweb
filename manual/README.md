@@ -11,7 +11,7 @@ There are two methods to install Istio, using the files in the *[istio](https://
 ### Method 1. Using istioctl with IstioOperatorAPI file
 We use istioctl command-line tool (following [official guide](https://istio.io/latest/docs/setup/install/istioctl/#prerequisites)) with the provided overlay file for our customization: 
 ```sh
-istioctl install -f istio-operator.yaml -y --verify
+istioctl install -f istio/istio-operator.yaml -y --verify
 ```
 The stdout at the end of installation may report "no Istio installation found" which is not a concern. 
 ### Method 2. Using Helm Chart

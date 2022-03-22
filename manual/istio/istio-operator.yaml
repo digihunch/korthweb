@@ -6,6 +6,7 @@ spec:
   profile: default
   hub: docker.io/istio
   tag: 1.13.2
+#  revision: 1-13-2
   namespace: istio-system
   meshConfig:
     accessLogFile: /dev/stdout
@@ -19,6 +20,12 @@ spec:
           minReplicas: 1
         nodeSelector:
           beta.kubernetes.io/os: linux
+        overlays:
+          - kind: Deployment
+            name: istiod
+            patches:
+            - path: spec.template.metadata.labels.version
+              value: 1.13.2
     ingressGateways:
     - name: istio-ingressgateway
       enabled: true
@@ -53,6 +60,21 @@ spec:
             port: 11112
             protocol: TCP
             targetPort: 4242
+        overlays:
+          - kind: Deployment
+            name: istio-ingressgateway 
+            patches:
+            - path: spec.template.metadata.labels.version
+              value: 1.13.2
     egressGateways:
     - name: istio-egressgateway
       enabled: true
+      label:
+        istio: egressgateway
+      k8s:
+       overlays:
+          - kind: Deployment
+            name: istio-egressgateway
+            patches:
+            - path: spec.template.metadata.labels.version
+              value: 1.13.2
