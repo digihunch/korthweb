@@ -15,4 +15,4 @@ configMapGenerator:
   - istio-extension-dashboard.json
   options:
     labels:
-      grafana_dashboard: 1
+      grafana_dashboard: "1"
