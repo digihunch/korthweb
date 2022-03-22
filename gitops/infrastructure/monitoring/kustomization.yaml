@@ -7,12 +7,12 @@ resources:
 configMapGenerator:
 - name: istio-dashboards
   files:
-  - pilot-dashboard.json
-  - istio-workload-dashboard.json
-  - istio-service-dashboard.json
-  - istio-performance-dashboard.json
-  - istio-mesh-dashboard.json
-  - istio-extension-dashboard.json
+  - dashboard/pilot-dashboard.json
+  - dashboard/istio-workload-dashboard.json
+  - dashboard/istio-service-dashboard.json
+  - dashboard/istio-performance-dashboard.json
+  - dashboard/istio-mesh-dashboard.json
+  - dashboard/istio-extension-dashboard.json
   options:
     labels:
       grafana_dashboard: "1"
