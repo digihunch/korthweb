@@ -14,5 +14,5 @@ configMapGenerator:
   - istio-mesh-dashboard.json
   - istio-extension-dashboard.json
   options:
-  labels:
-    grafana_dashboard: 1
+    labels:
+      grafana_dashboard: 1
