@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: monitoring
+resources:
+  - pod-monitor-dp.yaml
+  - service-monitor-cp.yaml 
+configMapGenerator:
+- name: istio-dashboards
+  files:
+  - pilot-dashboard.json
+  - istio-workload-dashboard.json
+  - istio-service-dashboard.json
+  - istio-performance-dashboard.json
+  - istio-mesh-dashboard.json
+  - istio-extension-dashboard.json
+  options:
+  labels:
+    grafana_dashboard: 1

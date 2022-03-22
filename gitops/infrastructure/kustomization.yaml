@@ -4,3 +4,6 @@ resources:
   - sources
   - istiod 
   - cert-manager
+  - prometheus
+  - monitoring
+  - kiali

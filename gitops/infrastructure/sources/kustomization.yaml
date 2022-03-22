@@ -5,3 +5,5 @@ resources:
   - istio.yaml
   - bitnami.yaml
   - jetstack.yaml
+  - kiali.yaml
+  - prometheus.yaml
