@@ -5,5 +5,5 @@ resources:
   - istiod 
   - cert-manager
   - prometheus
-  - monitoring
+#  - monitoring
   - kiali
