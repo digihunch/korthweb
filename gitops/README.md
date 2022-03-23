@@ -26,10 +26,18 @@ A deployment key will be created. FluxCD will be install on the cluster, and sca
 ```sh
 flux get ks --watch
 ```
-For troubleshooting, in the flux-system namespace, check the CRD status. It is also helpful to check the log of Flux:
+It may take 10 minutes to sync all layers. At the end, the output should look like this:
 ```sh
-flux logs
+NAME           	READY	MESSAGE                       	REVISION    	SUSPENDED
+dev-application	True 	Applied revision: main/feffc67	main/feffc67	False
+dev-dependency 	True 	Applied revision: main/feffc67	main/feffc67	False
+flux-system    	True 	Applied revision: main/feffc67	main/feffc67	False
+infrastructure 	True 	Applied revision: main/feffc67	main/feffc67	False
+observability  	True 	Applied revision: main/feffc67	main/feffc67	False
+tst-application	True 	Applied revision: main/feffc67	main/feffc67	False
+tst-dependency 	True 	Applied revision: main/feffc67	main/feffc67	False
 ```
+
 ## Validation
 The validation steps is the same as with the [manual](https://github.com/digihunch/korthweb/blob/main/manual/README.md#validation) approach in principal. The difference with the GitOps approach, is that there are two namespaces tst-orthweb and dev-orthweb, both of which need to be tested.
 
@@ -50,22 +58,15 @@ $ storescu -c ORTHANC@dicom.tst.orthweb.com:11112 --tls12 --tls-aes --trust-stor
 ```
 To test C-STORE, use the storescu command with a dcm file as an additional argument. C-STORE will also test database write. C-STORE should come successful with a status code of 0 in C-STORE-RSP.
 
-To check Pod logs, use Kiali. Kiali should be configured and exposed via a virtual service. For a quick install, apply the following manifests
+To check Pod logs, use Kiali. We can use port-forward to expose kiali service.
 ```sh
-$ kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/jaeger.yaml
-$ kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/grafana.yaml
-$ kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/prometheus.yaml
-$ kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/kiali.yaml
-$ istioctl dashboard kiali
-```
-The istioctl command should launch browser to Kiali page. Or alternatively use port-forward to expose kiali service.
-```sh
-kubectl -n istio-system port-forward svc/kiali 8080:20001
+kubectl port-forward svc/kiali -n monitoring 8080:20001
 ```
 
-## Troubleshoot
+## Troubleshooting
 
-Once you fork from this repository and follow this guide, it should just work and every Kustomization should eventually come to ready status. In case of error, below is how I usually troubleshoot.
+Once you fork from this repository and follow this guide, it should just work and every Kustomization should eventually come to ready status. 
+In case of error, below is how I usually troubleshoot.
 
 1. Examine status of each Kustomization. The following command is essentially the same as "fluxctl get ks":
 ```sh
@@ -117,3 +118,8 @@ Events:
   Normal  error   11m   helm-controller  Helm install failed: YAML parse error on postgresql-ha/templates/postgresql/statefulset.yaml: error converting YAML to JSON: yaml: line 32: could not find expected ':'
   ```
   The error provides the detail of the reason for failure in the Helm Deployment.
+
+4. You can also check the log of Flux:
+```sh
+flux logs
+```

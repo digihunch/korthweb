@@ -54,7 +54,7 @@ kubectl label -n monitoring cm istio-dashboards grafana_dashboard=1
 
 helm install --namespace operator kiali-operator  kiali/kiali-operator --create-namespace -f monitoring/kiali-value.yaml
 ```
-To launch kiali from Minikube, run:  
+To launch Kiali from command terminal, run:  
 ```sh
 $ kubectl port-forward svc/kiali -n monitoring 8080:20001
 ```
