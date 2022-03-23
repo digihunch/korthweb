@@ -66,6 +66,11 @@ spec:
             patches:
             - path: spec.template.metadata.labels.version
               value: 1.13.2
+            - path: spec.template.spec.containers[name:istio-proxy].lifecycle
+              value:
+                preStop:
+                  exec:
+                    command: ["sh", "-c", "sleep 5"]
     egressGateways:
     - name: istio-egressgateway
       enabled: true
