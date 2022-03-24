@@ -2,7 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: orthweb-cert
-  namespace: orthweb 
+  namespace: istio-system
 spec:
   commonName: orthweb.com 
   secretName: orthweb-secret

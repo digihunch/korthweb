@@ -9,7 +9,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: my-ca
-  namespace: orthweb 
+  namespace: istio-system 
 spec:
   isCA: true
   commonName: my-ca
@@ -26,7 +26,7 @@ apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: my-ca-issuer
-  namespace: orthweb 
+  namespace: istio-system 
 spec:
   ca:
     secretName: ca-secret

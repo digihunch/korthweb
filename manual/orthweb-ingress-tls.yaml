@@ -1,14 +1,5 @@
 ## gateway and virtual service for web and dicom traffic
 
-## web.orthweb.com and dicom.orthweb.com should resolve to IP address of ingress gateway
-# kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-## test ingress gateway for web traffic using curl
-# curl -HHost:web.orthweb.com -v -k -X GET https://web.orthweb.com:443/app/explorer.html -u orthanc:orthanc --cacert ca.crt
-## test ingresss gateway for dicom traffic 
-# using dcm4che: 
-# keytool -import -alias orthweb -file ca.crt -storetype JKS -keystore client.truststore
-# ./storescu -c ORTHANC@dicom.orthweb.com:11112 --tls12 --tls-aes --trust-store path/to/client.truststore --trust-store-pass Password123!
-
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:

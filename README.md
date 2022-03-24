@@ -1,8 +1,22 @@
 # Korthweb - Orthanc deployment on Kubernetes
 Korthweb project provides two approaches to automatically deploy [Orthanc](https://www.orthanc-server.com/) on Kubernetes. Orthanc is an open-source application to ingest, store, display and distribute medical images. Korthweb is a sister project of [Orthweb](https://github.com/digihunch/orthweb), an deployment automation project for Orthanc on AWS EC2. 
 
-## Kubernetes Cluster
-For this project, we need a Kubernetes cluster. If you need guidance, refer to *[real-quicK-cluster](https://github.com/digihunch/real-quicK-cluster)* project to provision one. A simple cluster as a playground only takes a couple commands to create.
+## TL;DR
+Depending on your background, you may use different parts of this project as an example of the following configurations:
+
+* Deploying orthanc on Kubernetes
+* DICOM and web workload on Kubernetes
+* GitOps with FluxCD for Continuous Deployment
+* Traffic routing with Istio (Gateway, Virtual Serivce)
+* Istio installation (using helm or istioctl)
+* Security with Istio (Peer Authentication/mTLS, Authorization Policy)
+* Deployment of Observability addons for Istio
+* Use Helm chart to deploy PostgreSQL
+* Build your own Helm Chart
+* Use Traefik CRD for Ingress
+* Use Cert Manager
+
+To get started, we need a Kubernetes cluster. My *[real-quicK-cluster](https://github.com/digihunch/real-quicK-cluster)* project has guidance to provision a demo cluster real quick (with a couple commands).
 
 ## Deployment Approach
 In this project we explore two approaches for Orthanc deployment, along with a manual approach. Files required for each approach are stored in their own sub-directory with their instructions. The table below is an overview:
@@ -10,7 +24,7 @@ In this project we explore two approaches for Orthanc deployment, along with a m
 |--|--|--|
 | [GitOps](https://github.com/digihunch/korthweb/tree/main/gitops) | - Istio Ingress <br> - Other Istio Features <br> - PostgreSQL <br> - Cert-Manager<br> - Multi-tenancy <br> - Observability| - Includes YAML manifests required for GitOps-based automated deployment using FluxCD. <br> - Take this approach for complete feature set with a powerful deployment workflow. <br> - Two tenants/environments (dev and tst) are deployed.
 | [Helm Chart](https://github.com/digihunch/korthweb/tree/main/helm) | - Traefik Ingress <br> - PostgreSQL | - Includes the Helm chart to configure Orthanc and its dependencies with a single command. <br> - Take this approach for simplicity with essential features.
-| [Manual](https://github.com/digihunch/korthweb/tree/main/manual) | - Istio Ingress <br> - Other Istio Features <br> - PostgreSQL <br> - Cert-Manager <br> - Observability | - Includes YAML manifests for all required resources for users to manually apply. <br> - Take this approach ONLY for troubleshooting or learning. |
+| [Manual](https://github.com/digihunch/korthweb/tree/main/manual) | - Istio Ingress <br> - Other Istio Features <br> - PostgreSQL <br> - Cert-Manager <br> - Observability (Lite) | - Includes YAML manifests for all required resources for users to manually apply. <br> - Take this approach ONLY for troubleshooting or learning. |
 
 For detailed instructions, go to the sub-directory named after the intended approach. Depending on the approach, the following tools need to be installed:
 * [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl): connect to API server to manage the Kubernetes cluster. With multiple clusters, you need to [switch context](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/).
