@@ -6,38 +6,34 @@ In this instruction, we deploy Orthanc manually. Use this instruction only if yo
 This manual approach uses external Helm Chart for dependencies (Istio, Cert-Manager and PostgreSQL) and applies YAML manifests for the rest of the workload.
 
 ## Install Istio and observability add-on
-The files used are kept in the *[istio](https://github.com/digihunch/korthweb/tree/main/manual/istio)* directory. We can install istio using Helm chart or using istioctl. We use istioctl because it is more common (as per [official guide](https://istio.io/latest/docs/setup/install/istioctl/#prerequisites)) and it is done in a single command:
+The files used are kept in the *[istio](https://github.com/digihunch/korthweb/tree/main/manual/istio)* directory. Two options to install istio are: using Helm chart and using istioctl. We use istioctl because it is more common as it can be done in a single command:
 
 ```sh
 istioctl install -f istio/istio-operator.yaml -y --verify
 ```
-If you prefer to install istio using Helm charts, use the install-using-helm.sh script. Then we can install observability addons and view Kiali dashboard
+Instead of the command above, we can alternatively call istio's Helm charts, by running the [install-using-helm.sh](https://github.com/digihunch/korthweb/blob/main/manual/istio/install-using-helm.sh) script from istio directory. After istio installation, we can install observability addons and view Kiali dashboard (with istioctl or via port-forwarding) once the Isto deployment is completed.
 ```sh
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/jaeger.yaml
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/grafana.yaml
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/prometheus.yaml
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/master/samples/addons/kiali.yaml
-```
-Wait until the Pods are created and we can connect to Kiali dashboard using one of the commands below:
-```sh
 istioctl dashboard kiali
 kubectl port-forward svc/kiali -n istio-system 8080:20001
 ```
-Note this method of installing Kiali is for demo ony. 
+Note this method of installing Kiali is for demo ony. Kiali may take a few minutes to come up.
 
 ## Configure certificates
 In this step, we generate our own X.509 key and certificate for ingress. We start by installing cert manager.
 ```sh
 helm install cert-manager cert-manager --namespace cert-manager --create-namespace --version v1.7.1 --repo https://charts.jetstack.io --set installCRDs=true
 ```
-Confrim all Pods in cert-manager namespace come up. Then we use cert-manager resources to create what we need in the orthweb namespace. The manifests are in certs directory.
+Confrim all Pods in cert-manager namespace come up. Then we use cert-manager CRs to create certificate in istio-system namespace, and verify the certificate by decoding the secret object.
 ```sh
-kubectl apply -f certs/ca.yaml
-kubectl apply -f certs/site.yaml
-```
-Now we can verify the certificate created in istio-system namespace by decoding the secret. We'll also store the encoded certificate to a file and convert it to a Java trust store for later use.
-```sh
+kubectl apply -f certs.yaml
 openssl x509 -in <(kubectl -n istio-system get secret orthweb-secret -o jsonpath='{.data.ca\.crt}' | base64 -d) -text -noout 
+```
+Now we store the encoded certificate to a file and convert it to a Java trust store for later use.
+```sh
 kubectl -n istio-system get secret orthweb-secret -o jsonpath='{.data.ca\.crt}' | base64 -d > ca.crt
 keytool -import -alias orthweb.com -file ca.crt -storetype JKS -noprompt -keystore client.truststore -storepass Password123!
 ```
@@ -53,11 +49,10 @@ helm install postgres-ha postgresql-ha \
        --repo https://charts.bitnami.com/bitnami \
        --namespace orthweb
 kubectl -n orthweb wait deploy/postgres-ha-postgresql-ha-pgpool --for=condition=Available
-kubectl apply -f orthweb-workload.yaml
+kubectl apply -f orthanc.yaml
 kubectl -n orthweb get po --watch
-kubectl apply -f orthweb-ingress-tls.yaml
 ```
-As a side note, I had to implement a trick here. Since Helm chart parameter [pgpool.initdbScriptsCM](https://artifacthub.io/packages/helm/bitnami/postgresql-ha#initialize-a-fresh-instance) does not take file with .sql extension. We store the init script db_create.sql as an entry in orthanc-dbinit config map ahead of time before running the Helm chart.
+As a side note, I had to implement a trick here. Since Helm chart parameter [pgpool.initdbScriptsCM](https://artifacthub.io/packages/helm/bitnami/postgresql-ha#initialize-a-fresh-instance) does not take file with .sql extension. We store the init script db_create.sql as an entry in orthanc-dbinit config map ahead of time before running the Helm chart. The postgres pods takes a few mintues after helm install to come all up. If the kubectl wait command times out, try it again. 
 
 The Orthanc Pods contains [readiness probe](https://stackoverflow.com/questions/33484942/how-to-use-basic-authentication-in-a-http-liveness-probe-in-kubernetes) for HTTP health check. A ClusterIP service exposes port 4242 for DICOM traffic, and 8042 for HTTP traffic. The last command installs istio virtual service and gateways for HTTP and DICOM traffic in orthweb-ingress-tls.yaml
 
