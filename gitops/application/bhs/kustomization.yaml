@@ -1,6 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: tst-orthweb
+namespace: bhs-orthweb
 resources:
   - namespace.yaml
   - ../base/orthanc
@@ -18,7 +18,7 @@ patchesStrategicMerge:
   metadata:
     name: orthanc-app
   data:
-    db.addr: postgres-ha-postgresql-ha-pgpool.tst-orthweb.svc.cluster.local 
+    db.addr: postgres-ha-postgresql-ha-pgpool.bhs-orthweb.svc.cluster.local 
 replicas:
 - name: orthanc
   count: 3
@@ -30,7 +30,7 @@ patches:
       - op: replace
         path: /spec/servers/0/hosts
         value:
-        - dicom.tst.orthweb.com
+        - dicom.bhs.orthweb.com
   - target:
       kind: Gateway
       name: web-gw
@@ -38,7 +38,7 @@ patches:
       - op: replace
         path: /spec/servers/0/hosts
         value:
-        - web.tst.orthweb.com
+        - web.bhs.orthweb.com
   - target:
       kind: VirtualService 
       name: dcm-vs
@@ -46,7 +46,7 @@ patches:
       - op: replace
         path: /spec/hosts
         value:
-        - dicom.tst.orthweb.com
+        - dicom.bhs.orthweb.com
   - target:
       kind: VirtualService
       name: web-vs
@@ -54,7 +54,7 @@ patches:
       - op: replace
         path: /spec/hosts
         value:
-        - web.tst.orthweb.com
+        - web.bhs.orthweb.com
   - target:
       kind: AuthorizationPolicy
       name: authz-policy-orthanc
@@ -63,7 +63,7 @@ patches:
         path: /spec/rules/0/from/0/source/namespaces
         value:
         - istio-system
-        - tst-orthweb 
+        - bhs-orthweb 
   - target:
       kind: AuthorizationPolicy
       name: authz-policy-orthanc 
@@ -72,7 +72,7 @@ patches:
         path: /spec/rules/1/from/0/source/namespaces
         value: 
         - istio-system
-        - tst-orthweb
+        - bhs-orthweb
   - target:
       kind: AuthorizationPolicy
       name: authz-policy-postgres 
@@ -80,4 +80,4 @@ patches:
       - op: add
         path: /spec/rules/0/from/0/source/namespaces
         value: 
-        - tst-orthweb
+        - bhs-orthweb

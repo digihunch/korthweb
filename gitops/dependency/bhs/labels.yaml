@@ -3,7 +3,7 @@ kind: LabelTransformer
 metadata:
   name: labels
 labels:
-  env: tst 
+  org: bhs
   workload: orthweb
 fieldSpecs:
   - path: metadata/labels

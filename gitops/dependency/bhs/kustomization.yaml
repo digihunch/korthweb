@@ -1,6 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: tst-orthweb
+namespace: bhs-orthweb
 resources:
   - namespace.yaml
   - ../base/certificates
@@ -11,10 +11,10 @@ transformers:
 patches:
   - patch: |-
       - op: replace
-        path: /spec/dnsNames
+        path: /spec/dnsNames 
         value:
-        - web.tst.orthweb.com
-        - dicom.tst.orthweb.com
+        - web.bhs.orthweb.com 
+        - dicom.bhs.orthweb.com
     target:
       kind: Certificate
       name: orthweb-cert

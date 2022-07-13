@@ -1,28 +1,28 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: dev-application
+  name: bhs-application
   namespace: flux-system
 spec:
   interval: 10m0s
   dependsOn:
-    - name: dev-dependency
+    - name: bhs-dependency
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./gitops/application/dev
+  path: ./gitops/application/bhs
   prune: true
   validation: client
   healthChecks:  
     - apiVersion: networking.istio.io/v1alpha3 
       kind: Gateway
       name: web-gw
-      namespace: dev-orthweb
+      namespace: bhs-orthweb
     - apiVersion: networking.istio.io/v1alpha3 
       kind: Gateway
       name: dcm-gw
-      namespace: dev-orthweb
+      namespace: bhs-orthweb
     - apiVersion: apps/v1
       kind: Deployment
       name: orthanc
-      namespace: dev-orthweb
+      namespace: bhs-orthweb

@@ -1,7 +1,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: tst-dependency 
+  name: bhs-dependency 
   namespace: flux-system
 spec:
   interval: 10m0s
@@ -10,28 +10,28 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./gitops/dependency/tst
+  path: ./gitops/dependency/bhs
   prune: true
   validation: client
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
       name: postgres-ha-postgresql-ha-pgpool
-      namespace: tst-orthweb
+      namespace: bhs-orthweb
     - apiVersion: cert-manager.io/v1
       kind: Certificate
       name: orthweb-cert
-      namespace: tst-orthweb
+      namespace: bhs-orthweb
     - apiVersion: helm.toolkit.fluxcd.io/v2beta1 
       kind: HelmRelease
       name: istio-egress
-      namespace: tst-orthweb
+      namespace: bhs-orthweb
     - apiVersion: helm.toolkit.fluxcd.io/v2beta1 
       kind: HelmRelease
       name: istio-ingress
-      namespace: tst-orthweb
+      namespace: bhs-orthweb
     - apiVersion: helm.toolkit.fluxcd.io/v2beta1
       kind: HelmRelease
       name: postgres-ha 
-      namespace: tst-orthweb
+      namespace: bhs-orthweb
  

@@ -1,28 +1,28 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: tst-application
+  name: mhr-application
   namespace: flux-system
 spec:
   interval: 10m0s
   dependsOn:
-    - name: tst-dependency
+    - name: mhr-dependency
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./gitops/application/tst
+  path: ./gitops/application/mhr
   prune: true
   validation: client
   healthChecks:  
     - apiVersion: networking.istio.io/v1alpha3 
       kind: Gateway
       name: web-gw
-      namespace: tst-orthweb
+      namespace: mhr-orthweb
     - apiVersion: networking.istio.io/v1alpha3 
       kind: Gateway
       name: dcm-gw
-      namespace: tst-orthweb
+      namespace: mhr-orthweb
     - apiVersion: apps/v1
       kind: Deployment
       name: orthanc
-      namespace: tst-orthweb
+      namespace: mhr-orthweb
