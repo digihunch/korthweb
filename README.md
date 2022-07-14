@@ -32,12 +32,7 @@ I started this project by manually applying a few manifests. For templating capa
 The artifacts of each automation approach are kept in their eponymous sub-directories. As the table above suggests, go with the GitOps approach for deployment capability. Go with the Helm Chart approach for quick installation.
 
 ## Architectural Considerations
-Orthanc with its dependencies in production must be configured with scalability, resiliency and high availability. Even though Korthweb is a starting point with minimum configuration, there is no one-size-fit-all solution design, I included two guidelines for database and image storage:
-
-- The database solution guideline discusses how to host database for Orthanc to index imaging data
-- The storaget solution guideline discusses how to build storage solution to persist pixel data.
-
-The rest of this section discusses networking, security and deployment automation.
+Orthanc with its dependencies in production must be configured with scalability, resiliency and high availability. Even though Korthweb is a starting point with minimum configuration, there is no one-size-fit-all solution design, I included a [separate guideline](https://github.com/digihunch/korthweb/blob/main/SolutionGuideline.md) for database and image storage. The rest of this section discusses networking, security and deployment automation.
 
 ### Ingress
 At container level, Orthanc uses TCP port 8042 for web traffic, and TCP port 4242 for DICOM traffic. On Kubernetes, we use ingress to expose both ports (443 for web and 11112 for DICOM). The ingress controller also does TLS termination and load balancing.
