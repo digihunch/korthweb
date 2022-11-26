@@ -5,10 +5,10 @@
 replicaCount: 3
 
 image:
-  repository: jodogne/orthanc-plugins 
+  repository: osimis/orthanc 
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.9.7"
+  tag: "22.11.3"
 
 imagePullSecrets: []
 nameOverride: ""

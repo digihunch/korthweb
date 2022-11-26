@@ -1,4 +1,4 @@
-apiVersion: autoscaling/v2beta1
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: orthanc
@@ -13,8 +13,12 @@ spec:
     - type: Resource
       resource:
         name: cpu
-        targetAverageUtilization: 85
+        target:
+          type: Utilization
+          averageUtilization: 85
     - type: Resource
       resource:
         name: memory
-        targetAverageUtilization: 85
+        target:
+          type: Utilization
+          averageUtilization: 85

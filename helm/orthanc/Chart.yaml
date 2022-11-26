@@ -15,7 +15,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.2.0
+version: 0.3.0
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
@@ -27,31 +27,13 @@ dependencies:
   - condition: postgresql-ha.enabled 
     name: postgresql-ha
     repository: https://charts.bitnami.com/bitnami
-    version: ~8.4.0
+    version: ~10.0.5
     #alias: database # note: alias here will cause changes in service name.
     tags:
     - orthanc-database
   - condition: traefik.enabled
     name: traefik
     repository: https://helm.traefik.io/traefik
-    version: 10.x.x
+    version: 20.5.x
     tags:
     - orthanc-traefik
-#  - condition: logging.enabled
-#    name: elasticsearch
-#    repository: https://helm.elastic.co
-#    version: 7.14.x
-#    alias: logging-elastic
-#    tags:
-#    - orthanc-logging
-#  - condition: logging.enabled
-#    name: kibana
-#    repository: https://helm.elastic.co
-#    version: 7.14.x
-#    alias: logging-kibana
-#    tags:
-#    - orthanc-logging
-    #import-values:
-    #  - child: . 
-    #    parent: testkibana
-   # the ability to import the entire child is a feature pending https://github.com/helm/helm/issues/9817

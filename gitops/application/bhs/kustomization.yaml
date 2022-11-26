@@ -9,8 +9,8 @@ transformers:
   - labels.yaml
 images:
 - name: orthanc-plugins
-  newName: jodogne/orthanc-plugins
-  newTag: 1.9.7
+  newName: osimis/orthanc 
+  newTag: 22.11.3
 patchesStrategicMerge:
 - |-
   apiVersion: v1

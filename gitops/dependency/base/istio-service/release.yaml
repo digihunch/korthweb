@@ -11,7 +11,7 @@ spec:
         kind: HelmRepository
         name: istio
         namespace: flux-system
-      version: "1.12.0"
+      version: "1.15.3"
   interval: 1h0m0s
   install:
     remediation:
@@ -43,7 +43,7 @@ spec:
         kind: HelmRepository
         name: istio
         namespace: flux-system
-      version: "1.12.0"
+      version: "1.15.3"
   interval: 1h0m0s
   install:
     remediation:

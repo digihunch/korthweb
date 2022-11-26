@@ -22,7 +22,9 @@ spec:
           defaultMode: 0755
       containers:
       - name: orthanc
-        image: jodogne/orthanc-plugins
+        image: osimis/orthanc:22.11.3 
+        #command: ["/bin/sh"]
+        #args: ["-c", "while true; do echo hello; sleep 10;done"]
         args: ["/run/secrets/"]
         ports:
           - containerPort: 8042
