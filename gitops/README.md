@@ -41,6 +41,15 @@ mhr-dependency 	True 	Applied revision: main/feffc67	main/feffc67	False
 ## Validation
 The validation steps is the same as with the [manual](https://github.com/digihunch/korthweb/blob/main/manual/README.md#validation) approach in principal. The difference with the GitOps approach, is that there are two namespaces mhr-orthweb and bhs-orthweb, both of which need to be tested.
 
+If you're testing using Minikube locally, you can mock DNS resolution to ingress IP by adding the followings to /etc/hosts:
+```sh
+192.168.64.16 web.bhs.orthweb.com
+192.168.64.16 dicom.bhs.orthweb.com
+192.168.64.17 web.mhr.orthweb.com
+192.168.64.17 dicom.mhr.orthweb.com
+```
+If you're testing on a Kubernetes cluster, also make sure DNS resolution works.
+
 To validate the bhs workload:
 ```sh
 $ kubectl -n bhs-orthweb get secret orthweb-secret -o jsonpath='{.data.ca\.crt}' | base64 --decode > ca.bhs.crt
