@@ -109,6 +109,7 @@ spec:
             periodSeconds: 120
             successThreshold: 1
             timeoutSeconds: 2
+          automountServiceAccountToken: false
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
