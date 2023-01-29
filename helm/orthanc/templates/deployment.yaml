@@ -47,7 +47,7 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.repository }}@{{ .Values.image.digest }}"
           args: ["/run/secrets/"]
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
@@ -62,7 +62,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: "{{ $.Release.Name }}-postgresql-ha-postgresql"
-                  key: postgresql-password
+                  key: password
             - name: DB_USERNAME
               valueFrom:
                 configMapKeyRef:
@@ -94,6 +94,19 @@ spec:
             failureThreshold: 3
             initialDelaySeconds: 10
             periodSeconds: 20
+            successThreshold: 1
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /app/explorer.html
+              port: http
+              scheme: HTTP
+              httpHeaders:
+                - name: Authorization
+                  value: Basic {{ "orthanc:orthanc" | b64enc }}  
+            failureThreshold: 3
+            initialDelaySeconds: 60
+            periodSeconds: 120
             successThreshold: 1
             timeoutSeconds: 2
           resources:

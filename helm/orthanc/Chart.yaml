@@ -21,19 +21,19 @@ version: 0.3.0
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "1.16.0"
+appVersion: "22.12.2"
 
 dependencies:
   - condition: postgresql-ha.enabled 
     name: postgresql-ha
     repository: https://charts.bitnami.com/bitnami
-    version: ~10.0.5
+    version: ~11.0.1
     #alias: database # note: alias here will cause changes in service name.
     tags:
     - orthanc-database
   - condition: traefik.enabled
     name: traefik
     repository: https://helm.traefik.io/traefik
-    version: 20.5.x
+    version: 20.8.x
     tags:
     - orthanc-traefik
