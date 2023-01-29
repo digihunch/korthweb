@@ -1,5 +1,19 @@
-# Korthweb - Orthanc deployment on Kubernetes
-Korthweb project provides two approaches to automatically deploy [Orthanc](https://www.orthanc-server.com/) on Kubernetes. Orthanc is an open-source application to ingest, store, display and distribute medical images. Korthweb is a sister project of [Orthweb](https://github.com/digihunch/orthweb), an deployment automation project for Orthanc on AWS EC2. 
+
+# Korthweb - Orthanc on Kubernetes
+
+<a href="https://www.orthanc-server.com/"><img style="float" align="right" src=".asset/orthanc_logo.png"></a>
+
+[![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?logo=kubernetes&logoColor=white)](https://www.kubernetes.io)
+[![Helm](https://img.shields.io/badge/helm-%230f1689.svg?logo=helm&logoColor=white)](https://helm.sh/)
+[![Istio](https://img.shields.io/badge/istio-%23466bb0.svg?logo=istio&logoColor=white)](https://www.istio.io/)
+[![TraefikProxy](https://img.shields.io/badge/traefikproxy-%2324a1c1.svg?logo=traefikproxy&logoColor=white)](https://traefik.io/traefik/)
+[![Prometheus](https://img.shields.io/badge/helm-%230f1689.svg?logo=prometheus&logoColor=white)](https://prometheus.io/)
+[![Grafana](https://img.shields.io/badge/grafana-%23f46800.svg?logo=grafana&logoColor=white)](https://grafana.com/)
+[![Postgres](https://img.shields.io/badge/prometheus-%23e6522c.svg?logo=prometheus&logoColor=white)](https://www.postgresql.org/)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Latest Release](https://img.shields.io/github/v/release/digihunch/korthweb)](https://github.com/digihunch/korthweb/releases/latest) 
+
+Korthweb project provides different approaches to deploy [Orthanc](https://www.orthanc-server.com/) on Kubernetes. Orthanc is an open-source application to ingest, store, display and distribute medical images. Korthweb is a sister project of [Orthweb](https://github.com/digihunch/orthweb), an deployment automation project for Orthanc on AWS. 
 
 ## TL;DR
 Users of this project may come from various backgrounds. The business requirement of this project is to deploy Orthanc (stateless app + database) on Kubernetes, to securely host DICOM and web workloads. To automate this effort, I have to incorporate the following configurations:
@@ -11,7 +25,7 @@ Users of this project may come from various backgrounds. The business requiremen
 * Security with Istio (Peer Authentication/mTLS, Authorization Policy)
 * Deploy observability addons (Prometheus, Grafana) for Istio
 * Use bitnami Helm chart to deploy PostgreSQL
-* Build your own Helm Chart to deploy apps
+* Build your own Helm Chart to deploy Orthanc
 * GitOps with FluxCD for Continuous Deployment
 
 To get started, you need a Kubernetes cluster. My *[real-quicK-cluster](https://github.com/digihunch/real-quicK-cluster)* project has guidance to provision a demo cluster real quick (with a couple commands). Apart from a cluster, you will also need the following tools on the client side:
@@ -25,9 +39,9 @@ I started this project by manually applying a few manifests. For templating capa
 
 | Automation Approach | Components Installed | Highlights |
 |--|--|--|
-| [GitOps](https://github.com/digihunch/korthweb/tree/main/gitops) | - Istio Ingress <br> - Other Istio Features <br> - PostgreSQL <br> - Cert-Manager<br> - Multi-tenancy <br> - Observability| - Includes YAML manifests required for GitOps-based automated deployment using FluxCD. <br> - Take this approach for best practices with continuous deployment. <br> - Two instances  (for two fictional healthcare facilities named BHC and MHR) are deployed.
-| [Helm Chart](https://github.com/digihunch/korthweb/tree/main/helm) | - Traefik Ingress <br> - PostgreSQL | - Includes the Helm chart to configure Orthanc and its dependencies with a single command. <br> - Take this approach to quickly install Orthanc on Kubernetes.
-| [Manual](https://github.com/digihunch/korthweb/tree/main/manual) | - Istio Ingress <br> - Other Istio Features <br> - PostgreSQL <br> - Cert-Manager <br> - Observability (Lite) | - Includes YAML manifests for all required resources for users to manually apply. <br> - Take this approach ONLY for troubleshooting or learning. |
+| #1 [GitOps](https://github.com/digihunch/korthweb/tree/main/gitops) | - Istio Ingress <br> - Other Istio Features <br> - PostgreSQL <br> - Cert-Manager<br> - Multi-tenancy <br> - Observability| - Includes YAML manifests required for GitOps-based automated deployment using FluxCD. <br> - Take this approach for best practices with continuous deployment. <br> - Two instances  (for two fictitious healthcare facilities named BHC and MHR) are deployed.
+| #2 [Helm Chart](https://github.com/digihunch/korthweb/tree/main/helm) | - Traefik Ingress <br> - PostgreSQL | - Includes the Helm chart to configure Orthanc and its dependencies with a single command. <br> - Take this approach to quickly install Orthanc on Kubernetes.
+| #3 [Manual](https://github.com/digihunch/korthweb/tree/main/manual) | - Istio Ingress <br> - Other Istio Features <br> - PostgreSQL <br> - Cert-Manager <br> - Observability (Lite) | - Includes YAML manifests for all required resources for users to manually apply. <br> - Take this approach ONLY for troubleshooting or learning. |
 
 The artifacts of each automation approach are kept in their eponymous sub-directories. As the table above suggests, go with the GitOps approach for deployment capability. Go with the Helm Chart approach for quick installation.
 

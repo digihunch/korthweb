@@ -20,12 +20,19 @@ spec:
         configMap:
           name: orthanc-app
           defaultMode: 0755
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: orthanc
-        image: osimis/orthanc:22.11.3 
-        #command: ["/bin/sh"]
-        #args: ["-c", "while true; do echo hello; sleep 10;done"]
+        image: osimis/orthanc@sha256:20413096878fb56bf8d09af08cf4055993dbcf507526f0561b26fc4d0ed7affc #22.12.2 
+        imagePullPolicy: Always
         args: ["/run/secrets/"]
+        securityContext:
+          capabilities:
+            drop:
+              - ALL
+          allowPrivilegeEscalation: false
         ports:
           - containerPort: 8042
         env:
@@ -33,7 +40,7 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: postgres-ha-postgresql-ha-postgresql 
-                key: postgresql-password
+                key: password
           - name: DB_USERNAME
             valueFrom:
               configMapKeyRef:
@@ -79,6 +86,26 @@ spec:
           periodSeconds: 20
           successThreshold: 1
           timeoutSeconds: 2
+        livenessProbe:
+          failureThreshold: 2
+          httpGet:
+            path: /app/explorer.html
+            port: 8042
+            scheme: HTTP
+            httpHeaders:
+              - name: Authorization
+                value: Basic b3J0aGFuYzpvcnRoYW5j
+          initialDelaySeconds: 60
+          periodSeconds: 120
+          successThreshold: 1
+          timeoutSeconds: 2
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+      automountServiceAccountToken: false
 ---
 apiVersion: v1
 kind: Service

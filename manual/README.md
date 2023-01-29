@@ -25,7 +25,7 @@ Note this method of installing Kiali is for demo ony. Kiali may take a few minut
 ## Configure certificates
 In this step, we generate our own X.509 key and certificate for ingress. We start by installing cert manager.
 ```sh
-helm install cert-manager cert-manager --namespace cert-manager --create-namespace --version v1.10.1 --repo https://charts.jetstack.io --set installCRDs=true
+helm install cert-manager cert-manager --namespace cert-manager --create-namespace --version v1.11.0 --repo https://charts.jetstack.io --set installCRDs=true
 ```
 Confrim all Pods in cert-manager namespace come up. Then we use cert-manager CRs to create certificate in istio-system namespace, and verify the certificate by decoding the secret object.
 ```sh
@@ -47,6 +47,7 @@ helm install postgres-ha postgresql-ha \
        --set volumePermissions.enabled=true \
        --set service.portName=tcp-postgresql \
        --repo https://charts.bitnami.com/bitnami \
+       --version 11.0.1 \
        --namespace orthweb
 kubectl -n orthweb wait deploy/postgres-ha-postgresql-ha-pgpool --for=condition=Available
 kubectl apply -f orthanc.yaml
