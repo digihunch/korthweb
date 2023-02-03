@@ -49,7 +49,7 @@ helm install postgres-ha postgresql-ha \
        --repo https://charts.bitnami.com/bitnami \
        --version 11.0.1 \
        --namespace orthweb
-kubectl -n orthweb wait deploy/postgres-ha-postgresql-ha-pgpool --for=condition=Available
+kubectl -n orthweb wait deploy/postgres-ha-postgresql-ha-pgpool --for=condition=Available --timeout=10m
 kubectl apply -f orthanc.yaml
 kubectl -n orthweb get po --watch
 ```
