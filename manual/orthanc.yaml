@@ -35,6 +35,7 @@ spec:
           allowPrivilegeEscalation: false
         ports:
           - containerPort: 8042
+          - containerPort: 4242
         env:
           - name: DB_PASSWORD
             valueFrom:
@@ -81,7 +82,7 @@ spec:
             scheme: HTTP
             httpHeaders:
               - name: Authorization
-                value: Basic b3J0aGFuYzpvcnRoYW5j
+                value: Basic YWRtaW46b3J0aGFuYw== 
           initialDelaySeconds: 10
           periodSeconds: 20
           successThreshold: 1
@@ -94,7 +95,7 @@ spec:
             scheme: HTTP
             httpHeaders:
               - name: Authorization
-                value: Basic b3J0aGFuYzpvcnRoYW5j
+                value: Basic YWRtaW46b3J0aGFuYw== 
           initialDelaySeconds: 60
           periodSeconds: 120
           successThreshold: 1
@@ -130,7 +131,7 @@ spec:
 ---
 ## gateway and virtual service for web and dicom traffic
 
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1beta1
 kind: Gateway
 metadata:
   name: web-gw
@@ -149,7 +150,7 @@ spec:
       mode: SIMPLE
       credentialName: orthweb-secret # secret in the same namespace as the istio-ingressgateway resource
 ---
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: web-vs
@@ -169,7 +170,7 @@ spec:
         port: 
           number: 8042
 ---
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1beta1
 kind: Gateway
 metadata:
   name: dcm-gw
@@ -183,12 +184,12 @@ spec:
       name: dicom
       protocol: TLS  
     hosts:
-    - "dicom.orthweb.com"
+    - "*"      # ingress expects incoming request to have SNI extension matching a host. If DICOM client does not support SNI extension at TLS layer, do not set host here.
     tls:
       mode: SIMPLE
       credentialName: orthweb-secret # secret in the same namespace as the istio-ingressgateway resource
 ---
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: dcm-vs
@@ -199,8 +200,10 @@ spec:
   gateways:
   - dcm-gw
   tcp:
-  - route:
+  - match:
+    - port: 11112 
+    route:
     - destination:
-        host: orthweb # service label 
+        host: orthweb # service label
         port: 
           number: 4242

@@ -34,6 +34,10 @@ data:
       "Name" : "Orthanc Configuration",
       "RemoteAccessAllowed" : true,
       "SslEnabled" : false,
+      "AuthenticationEnabled" : true,
+      "RegisteredUsers" : {
+        "admin" : "orthanc"
+      },
       "DicomTlsEnabled" : false,
       "DicomTlsRemoteCertificateRequired" : false,
       "PostgreSQL" : {
