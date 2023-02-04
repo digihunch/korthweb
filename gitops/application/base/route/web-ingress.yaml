@@ -1,4 +1,4 @@
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1beta1
 kind: Gateway
 metadata:
   name: web-gw
@@ -16,7 +16,7 @@ spec:
       mode: SIMPLE
       credentialName: orthweb-secret # secret in the same namespace as the istio-ingressgateway resource
 ---
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: web-vs
