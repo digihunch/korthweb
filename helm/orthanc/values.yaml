@@ -70,25 +70,18 @@ affinity: {}
 
 
 ## app configuration 
+catls:
+  secretName: ca-secret
+  caCommonName: ca.orthweb.com
 dbtls:
-  selfsign: true
+  secretName: dbtls-secret
   certCommonName: db.orthweb.com
-  certFilename: dbtls.crt 
-  certKeyFileName: dbtls.key
-  certCAFileName: dbtls-ca.crt
 dcmtls:
-  selfsign: true
+  secretName: dcmtls-secret
   certCommonName: dicom.orthweb.com
-  certFilename: dcmtls.crt 
-  certKeyFileName: dcmtls.key
-  certCAFileName: dcmtls-ca.crt
 https:
-  selfsign: true
+  secretName: https-secret
   certCommonName: web.orthweb.com
-  certFilename: https.crt 
-  certKeyFileName: https.key
-  certCAFileName: https-ca.crt
-  
 
 ## PostgreSQL chart configuration
 ## ref: https://github.com/bitnami/charts/blob/master/bitnami/postgresql-ha/values.yaml
@@ -102,7 +95,7 @@ postgresql-ha:
   pgpool:
     tls:
       enabled: true
-      certificatesSecret: db.orthweb.com 
+      certificatesSecret: dbtls-secret 
       certFilename: tls.crt
       certKeyFilename: tls.key
       #certCAFilename: ca.crt # configuring this will require client to precent its cert for verification.

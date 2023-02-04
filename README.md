@@ -15,10 +15,10 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Latest Release](https://img.shields.io/github/v/release/digihunch/korthweb)](https://github.com/digihunch/korthweb/releases/latest) 
 
-Korthweb project provides different approaches to deploy [Orthanc](https://www.orthanc-server.com/) on Kubernetes. Orthanc is an open-source application to ingest, store, display and distribute medical images. Korthweb is a sister project of [Orthweb](https://github.com/digihunch/orthweb), an deployment automation project for Orthanc on AWS. 
+Korthweb provides three options to deploy [Orthanc](https://www.orthanc-server.com/) on Kubernetes. Orthanc is an open-source application to ingest, store, display and distribute medical images. Korthweb focues on the deployment. It is a sister project of [Orthweb](https://github.com/digihunch/orthweb), an deployment automation project for Orthanc on AWS. 
 
 ## TL;DR
-Users of this project may come from various backgrounds. The business requirement of this project is to deploy Orthanc (stateless app + database) on Kubernetes, to securely host DICOM and web workloads. To automate this effort, I have to incorporate the following configurations:
+ The business requirement of this project is to deploy Orthanc (stateless app + database) on Kubernetes, to securely host DICOM and web workloads. To automate this effort, I have to incorporate the following configurations:
 
 * Ingress (Istio or Traefik) TLS termination on HTTP and TCP ports
 * Use Cert Manager to provision self-signed certificate
@@ -30,30 +30,31 @@ Users of this project may come from various backgrounds. The business requiremen
 * Build your own Helm Chart to deploy Orthanc
 * GitOps with FluxCD for Continuous Deployment
 
-To get started, you need a Kubernetes cluster. My *[real-quicK-cluster](https://github.com/digihunch/real-quicK-cluster)* project has guidance to provision a demo cluster real quick (with a couple commands). Apart from a cluster, you will also need the following tools on the client side:
+To get started, you need a Kubernetes cluster. My *[real-quicK-cluster](https://github.com/digihunch/real-quicK-cluster)* project has guidance to provision a demo cluster real quick. Apart from a cluster, you will also need the following tools on the client side:
 
 * [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl): connect to API server to manage the Kubernetes cluster. With multiple clusters, you need to [switch context](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/).
 * [helm](https://helm.sh/docs/intro/install/): helm is package manager for Kubernetes. It is used in all three approaches to install third party charts such as PostgreSQL
 * [istioctl](https://helm.sh/docs/intro/install/): istioctl is an alternative to helm to install istio manually.
 * [flux](https://fluxcd.io/docs/): FluxCD is a GitOps tool to keep target Kubernetes cluster in sync with the source of configuration in the GitOps directory. The name of FluxCD's CLI tool is *flux*.
-## Automation Approach
-I started this project by manually applying a few manifests. For templating capability, I then baked them into a Helm chart. For faster iteration, I then added a GitOps approach. As a result, the project today consists of three automation levels: manual, Helm Chart, and GitOps. The table below summarizes the differences among these automation levels:
 
-| Automation Approach | Components Installed | Highlights |
+## Deployment Options
+The project  consists of three deployment options GitOps drive, Helm Chart driven, and manual approach. The table below summarizes the differences:
+
+| Deployment Option | Components Installed | Highlights |
 |--|--|--|
-| #1 [GitOps](https://github.com/digihunch/korthweb/tree/main/gitops) | - Istio Ingress <br> - Other Istio Features <br> - PostgreSQL <br> - Cert-Manager<br> - Multi-tenancy <br> - Observability| - Includes YAML manifests required for GitOps-based automated deployment using FluxCD. <br> - Take this approach for best practices with continuous deployment. <br> - Two instances  (for two fictitious healthcare facilities named BHC and MHR) are deployed.
-| #2 [Helm Chart](https://github.com/digihunch/korthweb/tree/main/helm) | - Traefik Ingress <br> - PostgreSQL | - Includes the Helm chart to configure Orthanc and its dependencies with a single command. <br> - Take this approach to quickly install Orthanc on Kubernetes.
-| #3 [Manual](https://github.com/digihunch/korthweb/tree/main/manual) | - Istio Ingress <br> - Other Istio Features <br> - PostgreSQL <br> - Cert-Manager <br> - Observability (Lite) | - Includes YAML manifests for all required resources for users to manually apply. <br> - Take this approach ONLY for troubleshooting or learning. |
+| #1 [GitOps](https://github.com/digihunch/korthweb/tree/main/gitops) driven | - Istio Ingress <br> - Other Istio Features <br> - PostgreSQL <br> - Cert-Manager<br> - Multi-tenancy <br> - Observability| - Includes YAML manifests required for GitOps-based automated deployment using FluxCD. <br> - Take this approach for continuous deployment and end-to-end automation. <br> - Two instances are deployed, for two fictitious healthcare facilities acronymed BHC and MHR.
+| #2 [Helm Chart](https://github.com/digihunch/korthweb/tree/main/helm) driven | - Traefik Ingress <br> - PostgreSQL | - Includes the Helm chart to configure Orthanc and its dependencies with a single command. <br> - Take this approach to quickly install Orthanc on Kubernetes.
+| #3 [Manual](https://github.com/digihunch/korthweb/tree/main/manual) | - Istio Ingress <br> - Other Istio Features <br> - PostgreSQL <br> - Cert-Manager <br> - Observability (Lite) | - Includes YAML manifests for all required resources for users to manually apply. <br> - This option is considered legacy. Consider this option ONLY for troubleshooting or learning. |
 
-The artifacts of each automation approach are kept in their eponymous sub-directories. As the table above suggests, go with the GitOps approach for deployment capability. Go with the Helm Chart approach for quick installation.
+The artifacts of each deployment option are stored in eponymous sub-directories. As the table above suggests, go with the GitOps driven approach for rich capabilities and automation level.
 
-## Architectural Considerations
+## FAQ
 Orthanc with its dependencies in production must be configured with scalability, resiliency and high availability. Even though Korthweb is a starting point with minimum configuration, there is no one-size-fit-all solution design, I included a [separate guideline](https://github.com/digihunch/korthweb/blob/main/SolutionGuideline.md) for database and image storage. The rest of this section discusses networking, security and deployment automation.
 
 ### Ingress
 At container level, Orthanc uses TCP port 8042 for web traffic, and TCP port 4242 for DICOM traffic. On Kubernetes, we use ingress to expose both ports (443 for web and 11112 for DICOM). The ingress controller also does TLS termination and load balancing.
 
-In the Helm approach, we use [Traefik](https://doc.traefik.io/traefik/routing/providers/kubernetes-crd/) CRD for Ingress. In GitOps and Manual approaches where we install Istio, we use Istio Gateway as Ingress.  
+The Helm chart driven option uses [Traefik](https://doc.traefik.io/traefik/routing/providers/kubernetes-crd/) CRD for Ingress. The GitOps driven and manual approaches uses Istio Ingress CRD. For more details, read [my post](https://medium.com/slalom-build/managing-ingress-traffic-on-kubernetes-platforms-ebd537cdfb46) on how to choose the right ingress technology.  
 
 ### Istio
 [Service mesh](https://www.digihunch.com/2021/12/from-ingress-to-gateway-why-you-need-istio-gateways-on-kubernetes-platforms/) acts as an intermediary layer between the application workload and the underlying platform. This layer commoditizes a variety of common features, such as tracing, mTLS, traffic routing and management. While an application may choose build these features natively in its own code, the idea of service mesh is to allow application developer to focus on the business logic and push networking concerns to this intermediary layer.
@@ -74,3 +75,6 @@ The GitOps approach is more flexible than the Helm approach and can accomodate m
 
 ### Security
 This project is developed with security in mind. We create [self-signed certificate](https://www.digihunch.com/2022/01/creating-self-signed-x509-certificate/) to secure both DICOM and web traffic. In the Helm approach, we use Helm template to create self-signed certificate. In Gitops and manual approaches, we use cert manager. Certificate and Secrets are stored as Kubernetes secret object. 
+
+### DICOM Testing
+Regardless of deployment option, users need to validate DICOM capability. Each option provides dcmtk commands running C-ECHO and C-STORE against their respective DICOM endpoints. All DICOM communication are TLS enabled and correct testing involves understanding of how TLS works. Read my [blog post](https://www.digihunch.com/2023/02/dicom-testing-with-tls/) on DICOM testing guidelines. 

@@ -7,8 +7,19 @@ spec:
   minVersion: VersionTLS12
   maxVersion: VersionTLS13
   clientAuth:
-    clientAuthType: NoClientCert
-  sniStrict: true
+    clientAuthType: VerifyClientCertIfGiven 
+  sniStrict: false 
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: TLSStore
+metadata:
+  name: dicom-tls-default
+  namespace: {{ $.Release.Namespace | quote }}
+spec:
+  certificates:
+    - secretName: {{ .Values.dcmtls.secretName | quote }}
+  defaultCertificate:
+    secretName: {{ .Values.dcmtls.secretName | quote }} 
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
@@ -27,7 +38,7 @@ spec:
           port: http
           strategy: RoundRobin
   tls:
-    secretName: {{ .Values.https.certCommonName | quote }} 
+    secretName: {{ .Values.https.secretName | quote }} 
     options:
       name: orthweb-tls-option
       namespace: {{ $.Release.Namespace | quote }}
@@ -46,8 +57,11 @@ spec:
         - name: orthweb-orthanc
           port: dicom 
   tls:
-    secretName: {{ .Values.dcmtls.certCommonName | quote }} 
+    secretName: {{ .Values.dcmtls.secretName | quote }} 
     passthrough: false
     options:
       name: orthweb-tls-option
+      namespace: {{ $.Release.Namespace | quote }}
+    store: 
+      name: dicom-tls-default 
       namespace: {{ $.Release.Namespace | quote }}
