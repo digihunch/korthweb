@@ -38,11 +38,11 @@ To get started, you need a Kubernetes cluster. My *[real-quicK-cluster](https://
 * [flux](https://fluxcd.io/docs/): FluxCD is a GitOps tool to keep target Kubernetes cluster in sync with the source of configuration in the GitOps directory. The name of FluxCD's CLI tool is *flux*.
 
 ## Deployment Options
-The project  consists of three deployment options GitOps drive, Helm Chart driven, and manual approach. The table below summarizes the differences:
+The project  consists of three deployment options: GitOps, Helm Chart driven, and manual. The table below summarizes the differences:
 
 | Deployment Option | Components Installed | Highlights |
 |--|--|--|
-| #1 [GitOps](https://github.com/digihunch/korthweb/tree/main/gitops) driven | - Istio Ingress <br> - Other Istio Features <br> - PostgreSQL <br> - Cert-Manager<br> - Multi-tenancy <br> - Observability| - Includes YAML manifests required for GitOps-based automated deployment using FluxCD. <br> - Take this approach for continuous deployment and end-to-end automation. <br> - Two instances are deployed, for two fictitious healthcare facilities acronymed BHC and MHR.
+| #1 [GitOps](https://github.com/digihunch/korthweb/tree/main/gitops) | - Istio Ingress <br> - Other Istio Features <br> - PostgreSQL <br> - Cert-Manager<br> - Multi-tenancy <br> - Observability| - Includes YAML manifests required for GitOps-based automated deployment using FluxCD. <br> - Take this approach for continuous deployment and end-to-end automation. <br> - Two instances are deployed, for two fictitious healthcare facilities acronymed BHC and MHR.
 | #2 [Helm Chart](https://github.com/digihunch/korthweb/tree/main/helm) driven | - Traefik Ingress <br> - PostgreSQL | - Includes the Helm chart to configure Orthanc and its dependencies with a single command. <br> - Take this approach to quickly install Orthanc on Kubernetes.
 | #3 [Manual](https://github.com/digihunch/korthweb/tree/main/manual) | - Istio Ingress <br> - Other Istio Features <br> - PostgreSQL <br> - Cert-Manager <br> - Observability (Lite) | - Includes YAML manifests for all required resources for users to manually apply. <br> - This option is considered legacy. Consider this option ONLY for troubleshooting or learning. |
 

@@ -29,11 +29,14 @@ curl -HHost:web.orthweb.com -v -k -X GET https://web.orthweb.com:443/app/explore
 ```
 You should see HTML content of the website. 
 
-The steps to validate DICOM traffic is similiar to other deployment option. However, it is currently not available because:
-1. dcmtk utility does not send SNI in the TLS negotiation
-2. The StrictSNI option with Traefik proxy seems to be always in effect, even when it is set to false in TLS Option.
+The steps to validate DICOM traffic is similiar to other deployment option. However, it is currently limited because dcmtk utility does not send SNI in the TLS negotiation.
 
-Lastly, you can add a DCM file to the end of the storescu command to it sends an DICOM image to the server, and validate from web frontend.
+I was able to test C-ECHO and C-STORE on annonymous tls (+tla) without client certificate.
+
+```sh
+echoscu -aet TESTER -aec ORTHANC -d +tla -ic dicom.orthweb.com 11112
+storescu -aet TESTER -aec ORTHANC -d +tla -ic dicom.orthweb.com 11112 DICOM_CT/123.dcm
+```
 
 
 ## Architecture

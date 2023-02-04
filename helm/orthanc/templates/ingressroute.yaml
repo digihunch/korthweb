@@ -7,20 +7,20 @@ spec:
   minVersion: VersionTLS12
   maxVersion: VersionTLS13
   clientAuth:
-    clientAuthType: VerifyClientCertIfGiven 
+    clientAuthType: NoClientCert 
   sniStrict: false 
 ---
-apiVersion: traefik.containo.us/v1alpha1
-kind: TLSStore
-metadata:
-  name: dicom-tls-default
-  namespace: {{ $.Release.Namespace | quote }}
-spec:
-  certificates:
-    - secretName: {{ .Values.dcmtls.secretName | quote }}
-  defaultCertificate:
-    secretName: {{ .Values.dcmtls.secretName | quote }} 
----
+#apiVersion: traefik.containo.us/v1alpha1
+#kind: TLSStore
+#metadata:
+#  name: dicom-tls-default
+#  namespace: {{ $.Release.Namespace | quote }}
+#spec:
+#  certificates:
+#    - secretName: {{ .Values.dcmtls.secretName | quote }}
+#  defaultCertificate:
+#    secretName: {{ .Values.dcmtls.secretName | quote }} 
+#---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
@@ -62,6 +62,6 @@ spec:
     options:
       name: orthweb-tls-option
       namespace: {{ $.Release.Namespace | quote }}
-    store: 
-      name: dicom-tls-default 
-      namespace: {{ $.Release.Namespace | quote }}
+    #store: 
+    #  name: dicom-tls-default 
+    #  namespace: {{ $.Release.Namespace | quote }}

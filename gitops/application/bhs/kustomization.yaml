@@ -23,14 +23,14 @@ replicas:
 - name: orthanc
   count: 3
 patches:
-  - target:
-      kind: Gateway
-      name: dcm-gw
-    patch: |-
-      - op: replace
-        path: /spec/servers/0/hosts
-        value:
-        - dicom.bhs.orthweb.com
+#  - target:
+#      kind: Gateway
+#      name: dcm-gw
+#    patch: |-
+#      - op: replace
+#        path: /spec/servers/0/hosts
+#        value:
+#        - dicom.bhs.orthweb.com
   - target:
       kind: Gateway
       name: web-gw

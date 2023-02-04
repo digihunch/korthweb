@@ -129,3 +129,5 @@ traefik:
       port: 4242
       tls:
         enabled: true
+  additionalArguments:
+    - "--log.level=DEBUG"
