@@ -1,4 +1,4 @@
-# Deploy Orthanc as Helm Chart
+# Korthweb: the Helm Chart driven deployment option
 In this approach, we deploy Orthanc with a single helm command, using the purpose-built Orthanc Helm Chart stored in the *orthanc* sub-directory. This chart is not released in a public Helm Repository. The content is simply stored in the local sub-directory. In order to deploy, we need to clone this repo first and enter the helm directory. Then we update dependency and install the chart:
 ```sh
 $ git clone git@github.com:digihunch/korthweb.git
@@ -11,27 +11,28 @@ If you need to uninstall it and remove persistent data, simply run:
 ```sh
 helm -n orthweb uninstall orthweb && kubectl -n orthweb delete pvc -l app.kubernetes.io/component=postgresql 
 ```
-Then the uninstallation is done.
-## Validation
-Note, you need to ensure that the DNS names web.orthweb.com and dicom.orthweb.com resolve to the external IP address of the traefik service. Either via editing /etc/hosts or actually adding an A-record to DNS zone. Find out the external IP using the command below:
-```sh
-k -n orthweb get svc orthweb-traefik
-```
+Then the uninstall is done.
 
-Validation steps of the Helm approach is nearly identical to that of the [manual](https://github.com/digihunch/korthweb/tree/main/manual#validation) approach, except that the TLS secret name may be different. 
+## Validation
+
+Validation steps are nearly identical to those in the [manual](https://github.com/digihunch/korthweb/tree/main/manual#validation) approach, except that the TLS secret name may be different. First, find out the external IP address for traefik ingress:
+```sh
+kubectl -n orthweb get service orthweb-traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+```
+Ensure that the DNS names web.orthweb.com and dicom.orthweb.com resolve to the external IP address of the traefik service. 
 
 To validate web service:
 ```sh
-$ kubectl -n orthweb get secret web.orthweb.com -o jsonpath='{.data.ca\.crt}' | base64 -d > web.ca.crt
-$ curl -HHost:web.orthweb.com -v -k -X GET https://web.orthweb.com:443/app/explorer.html -u orthanc:orthanc --cacert web.ca.crt
-```
+kubectl -n orthweb get secret web.orthweb.com -o jsonpath='{.data.ca\.crt}' | base64 -d > ca.crt
 
-To validate DICOM service:
-```sh
-$ kubectl -n orthweb get secret dicom.orthweb.com -o jsonpath='{.data.ca\.crt}' | base64 -d > dicom.ca.crt
-$ keytool -import -alias dicom.orthweb.com -file dicom.ca.crt -storetype JKS -noprompt -keystore dicom.client.truststore -storepass Password123!
-$ storescu -c ORTHANC@dicom.orthweb.com:11112 --tls12 --tls-aes --trust-store dicom.client.truststore --trust-store-pass Password123!
+curl -HHost:web.orthweb.com -v -k -X GET https://web.orthweb.com:443/app/explorer.html -u admin:orthanc --cacert ca.crt
 ```
+You should see HTML content of the website. 
+
+The steps to validate DICOM traffic is similiar to other deployment option. However, it is currently not available because:
+1. dcmtk utility does not send SNI in the TLS negotiation
+2. The StrictSNI option with Traefik proxy seems to be always in effect, even when it is set to false in TLS Option.
+
 Lastly, you can add a DCM file to the end of the storescu command to it sends an DICOM image to the server, and validate from web frontend.
 
 

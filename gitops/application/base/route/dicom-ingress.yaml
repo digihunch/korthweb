@@ -1,4 +1,4 @@
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1beta1
 kind: Gateway
 metadata:
   name: dcm-gw
@@ -11,12 +11,12 @@ spec:
       name: tls-dicom
       protocol: TLS
     hosts:
-    - "dicom.orthweb.com"
+    - "*"
     tls:
       mode: SIMPLE
       credentialName: orthweb-secret # secret in the same namespace as the istio-ingressgateway resource
 ---
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: dcm-vs

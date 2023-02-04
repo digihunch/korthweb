@@ -14,11 +14,11 @@ spec:
   prune: true
   validation: client
   healthChecks:  
-    - apiVersion: networking.istio.io/v1alpha3 
+    - apiVersion: networking.istio.io/v1beta1 
       kind: Gateway
       name: web-gw
       namespace: mhr-orthweb
-    - apiVersion: networking.istio.io/v1alpha3 
+    - apiVersion: networking.istio.io/v1beta1 
       kind: Gateway
       name: dcm-gw
       namespace: mhr-orthweb

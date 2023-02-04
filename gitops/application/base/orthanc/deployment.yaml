@@ -73,7 +73,7 @@ spec:
             scheme: HTTP
             httpHeaders:
               - name: Authorization
-                value: Basic b3J0aGFuYzpvcnRoYW5j
+                value: Basic YWRtaW46b3J0aGFuYw== 
           initialDelaySeconds: 10
           periodSeconds: 20
           successThreshold: 1
@@ -86,7 +86,7 @@ spec:
             scheme: HTTP
             httpHeaders:
               - name: Authorization
-                value: Basic b3J0aGFuYzpvcnRoYW5j
+                value: Basic YWRtaW46b3J0aGFuYw== 
           initialDelaySeconds: 60
           periodSeconds: 120
           successThreshold: 1

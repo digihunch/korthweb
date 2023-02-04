@@ -90,7 +90,7 @@ spec:
               scheme: HTTP
               httpHeaders:
                 - name: Authorization
-                  value: Basic {{ "orthanc:orthanc" | b64enc }}  
+                  value: Basic {{ "admin:orthanc" | b64enc }}  
             failureThreshold: 3
             initialDelaySeconds: 10
             periodSeconds: 20
@@ -103,15 +103,15 @@ spec:
               scheme: HTTP
               httpHeaders:
                 - name: Authorization
-                  value: Basic {{ "orthanc:orthanc" | b64enc }}  
+                  value: Basic {{ "admin:orthanc" | b64enc }}  
             failureThreshold: 3
             initialDelaySeconds: 60
             periodSeconds: 120
             successThreshold: 1
             timeoutSeconds: 2
-          automountServiceAccountToken: false
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      automountServiceAccountToken: false
       volumes:
       - name: app-cm-vol
         configMap:
