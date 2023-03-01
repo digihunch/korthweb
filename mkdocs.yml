@@ -1,0 +1,20 @@
+site_name: Orthanc on Kubernetes
+theme:
+  name: material
+nav:
+  - Home: 'index.md'
+  - Infrastructure: 
+    - 'K8s Cluster': 'infrastructure/k8s-cluster.md'
+    - 'Networking': 'infrastructure/networking.md'
+    - 'Storage': 'infrastructure/storage.md'
+    - 'Database': 'infrastructure/database.md'
+  - Deployment:
+    - 'Overview': 'deployment/overview.md'
+    - 'GitOps Approach': 'deployment/gitops.md'
+    - 'Helm Approach': 'deployment/helm.md'
+    - 'Manual Approach': 'deployment/manual.md'
+  - Validation: 
+    - 'Overview': 'validation/overview.md'
+    - 'GitOps Approach': 'validation/gitops.md'
+    - 'Helm Approach': 'validation/helm.md'
+    - 'Manual Approach': 'validation/manual.md'
