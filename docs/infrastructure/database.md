@@ -1,0 +1,2 @@
+### Database
+I included Postgresql-HA sub-chart to demonstrate the capability but in real life it is preferred to host database as a managed service provided by cloud platform. This chart also configures TLS connection between Orthanc Pods and PostgreSQL service. The certificate is stored as a Kubernetes Secret named db.orthweb.com.

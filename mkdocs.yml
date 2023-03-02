@@ -1,6 +1,11 @@
 site_name: Orthanc on Kubernetes
+repo_name: digihunch/korthweb
+repo_url: https://github.com/digihunch/korthweb
+strict: true
+
 theme:
   name: material
+  language: en
 nav:
   - Home: 'index.md'
   - Infrastructure: 
@@ -18,3 +23,5 @@ nav:
     - 'GitOps Approach': 'validation/gitops.md'
     - 'Helm Approach': 'validation/helm.md'
     - 'Manual Approach': 'validation/manual.md'
+plugins:
+  - search

@@ -2,8 +2,9 @@
 
 While Orthanc application focuses on the core features in medical imaging, to operationalize it on Kubernetes platform, we need numerous auxiliary services for automation, traffic management, observability and security. Luckily, the cloud native ecosystem brings a plethora of open-source choices.
 
-## Auxiliary Tools
-Here is a glance at the technical requirements and how the chosen tools meet them:
+## Foundational services
+
+Here is a glance at the technical requirements and how the chosen tools address them:
 
 * The automated deployment needs provision self-signed certificates and reference them accordingly. Korthweb uses **Cert Manager** to meet this requirement.
 * We need to control ingress traffic from client into the K8s cluster with an Ingress Controller, e.g. request routing, TLS termination Korthweb uses **Traefik CRD**, or **Istio Ingress CRD** for this requirement.
@@ -13,15 +14,17 @@ Here is a glance at the technical requirements and how the chosen tools meet the
 * We need to deploy auxiliary services, Korthweb makes use of community-maintained **Helm Charts** stored in external **Helm Repo** and CLI utilities.
 * We need to orchestrate the deployment of Orthanc workloads. Korthweb leverages **FluxCD** for GitOps deployment approach, self-created **Helm Chart** for Helm deployment approach.
 
-## Approaches
+Korthweb provides artifacts to automatically deploy all the foundational services as discussed above. 
 
-Korthweb landed on three deployment approaches. Each approach differs in complexity and level of automation but all lead to a functional Orthanc deployment. The approaches are summarized as below:
+## Deployment Approaches
 
-| Deployment Approach | Components Installed | Highlights |
+There are three deployment approaches. Each approach differs in complexity and level of automation but all lead to a functional Orthanc deployment. The approaches are summarized as below:
+
+| Approach | Components Installed | Key Features and Considerations |
 |--|--|--|
-| [GitOps](https://github.com/digihunch/korthweb/tree/main/gitops) | - Istio Ingress CRD <br> - Other Service Mesh features supported by Istio <br> - PostgreSQL <br> - Cert-Manager<br> - Observability <br> - Multi-tenancy| - Includes artifacts for GitOps-based automated deployment using FluxCD. <br> - Take this approach for continuous deployment and end-to-end automation. <br> - Two tenants are deployed, for two fictitious healthcare facilities acronymed BHC and MHR.
-| [Helm](https://github.com/digihunch/korthweb/tree/main/helm) driven | - Traefik Ingress <br> - PostgreSQL | - Includes the Helm chart to configure Orthanc and its dependencies with a single command. <br> - Take this approach to quickly install Orthanc on Kubernetes.
-| [Manual](https://github.com/digihunch/korthweb/tree/main/manual) | - Istio Ingress <br> - Other Service Mesh features supported by Istio <br> - PostgreSQL <br> - Cert-Manager <br> - Observability (Lite) | - Includes artifacts for users to manually apply. <br> - Consider this option ONLY for troubleshooting or learning deployment|
+| [GitOps](https://github.com/digihunch/korthweb/tree/main/gitops) | - Istio CRD as Ingress <br> - Other Service Mesh features supported by Istio <br> - PostgreSQL <br> - Cert-Manager<br> - Observability <br> - Multi-tenancy| - Includes artifacts for GitOps-based automated deployment using FluxCD. <br> - Take this approach for continuous deployment and end-to-end automation. <br> - Two tenants are deployed, for two fictitious healthcare facilities acronymed BHC and MHR.
+| [Helm](https://github.com/digihunch/korthweb/tree/main/helm) | - Traefik CRD as Ingress <br> - PostgreSQL | - Includes the Helm chart to configure Orthanc and its dependencies with a single command. <br> - Take this approach to quickly install Orthanc on Kubernetes.
+| [Manual](https://github.com/digihunch/korthweb/tree/main/manual) | - Istio CRD as Ingress <br> - Other Service Mesh features supported by Istio <br> - PostgreSQL <br> - Cert-Manager <br> - Observability (Lite) | - Includes artifacts for users to manually apply. <br> - Consider this option ONLY for troubleshooting or learning deployment|
 
 The artifacts of each approach are stored in eponymous sub-directories. Korthweb recommends the GitOps approach.
 

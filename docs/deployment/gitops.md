@@ -21,7 +21,7 @@ export GITHUB_TOKEN=ghp_yyy55555XXXodr7ABBBB234CCccw
 ```
 In the next step, `flux` will consume this environment variable.
 
-## Installation
+## Deployment
 
 First, we bootstrap the cluster with `flux`. Suppose the name of your account is *digihunch*, and the repository name is korthweb, the command to run would be:
 
