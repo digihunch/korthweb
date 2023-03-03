@@ -17,7 +17,7 @@
 ## Introduction
 [Orthanc](https://www.orthanc-server.com/) is an open-source application suite to ingest, store, distribute and display medical images. [Osimis](https://www.osimis.io/) releases Orthanc in [Docker images](https://hub.docker.com/r/osimis/orthanc). Deployment of Orthanc can be complex. 
 
-To automate Orthanc deployment, we created [Orthweb](https://github.com/digihunch/orthweb) project, a reference Orthanc deployment on AWS. Further, we started this Korthweb project to host Orthanc on Kubernetes. Korthweb provides  reference deployments towards a modern, cloud-native and extensible medical imaging solution, combining the power of Orthanc and Kubernetes.
+To automate Orthanc deployment, Digi Hunch created [Orthweb](https://github.com/digihunch/orthweb) project, a reference Orthanc deployment on AWS. Further, we started this Korthweb project to host Orthanc on Kubernetes. Korthweb provides reference deployment paradigms towards a modern, cloud-native and extensible medical imaging solution, combining the power of Orthanc and Kubernetes.
 
 The Korthweb project comes with three deployment options, with different automation levels and feature sets. The goal is to deploy Orthanc workload on an established Kubernetes cluster. 
 
@@ -46,4 +46,3 @@ If you can connect to your K8s cluster with kubectl, assuming the user has admin
     manual/               # Artifacts for manual approach
     docs/                 # Documentation pages
     mkdocs.yml            # Documentation configuration
-

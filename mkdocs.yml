@@ -6,13 +6,23 @@ strict: true
 theme:
   name: material
   language: en
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
 nav:
   - Home: 'index.md'
-  - Infrastructure: 
-    - 'K8s Cluster': 'infrastructure/k8s-cluster.md'
-    - 'Networking': 'infrastructure/networking.md'
-    - 'Storage': 'infrastructure/storage.md'
-    - 'Database': 'infrastructure/database.md'
+  - Infrastructure: 'infrastructure/index.md'
+  - Tooling: 'tooling/index.md'
   - Deployment:
     - 'Overview': 'deployment/overview.md'
     - 'GitOps Approach': 'deployment/gitops.md'
@@ -23,5 +33,7 @@ nav:
     - 'GitOps Approach': 'validation/gitops.md'
     - 'Helm Approach': 'validation/helm.md'
     - 'Manual Approach': 'validation/manual.md'
+  - Security: 'security/index.md'
+  - Support: 'support/index.md'
 plugins:
   - search

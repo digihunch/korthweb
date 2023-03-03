@@ -1,9 +1,9 @@
-# Validation after GitOps approach
+# Validation for GitOps approach
 
-## Validation
-The validation steps is the same as with the [manual](https://github.com/digihunch/korthweb/blob/main/manual/README.md#validation) approach in principal. The difference with the GitOps approach, is that there are two namespaces mhr-orthweb and bhs-orthweb, both of which need to be tested.
+## Preparation
+The GitOps approach deploys two tenants: MHR and BHS. There are two namespaces mhr-orthweb and bhs-orthweb, both of which should be tested.
 
-Eitherway, make sure DNS resolution works. If you're testing using Minikube locally, you may mock DNS resolution to ingress IP by adding the followings to /etc/hosts:
+The first step is to make sure DNS resolution works. If you're on a Sandbox cluster such as Minikube, you may have to mock DNS resolution to ingress IP by adding the following entries to `/etc/hosts`:
 ```sh
 192.168.64.16 web.bhs.orthweb.com
 192.168.64.16 dicom.bhs.orthweb.com
@@ -11,7 +11,8 @@ Eitherway, make sure DNS resolution works. If you're testing using Minikube loca
 192.168.64.17 dicom.mhr.orthweb.com
 ```
 
-Take bhs facility as an example, the validation steps are as follows:
+## Generate client certificate
+Take BHS tenant as an example, we first create a client certificate for use later.
 ```sh
 # bhs: generate client key pair
 openssl req -new -newkey rsa:4096 -nodes -subj /C=CA/ST=Ontario/L=Waterloo/O=Digihunch/OU=Imaging/CN=dcmclient.bhs.orthweb.com/emailAddress=dcmclient@digihunch.com -keyout bhs.client.key -out bhs.client.csr
@@ -22,10 +23,19 @@ kubectl -n bhs-orthweb get secret int-ca-secret -o jsonpath='{.data.tls\.crt}' |
 
 # bhs: get intermediate CA to sign client cert 
 openssl x509 -req -sha256 -days 365 -in bhs.client.csr -CA bhs.int.ca.crt -CAkey bhs.int.ca.key -set_serial 01 -out bhs.client.crt
+```
 
+## Validate web service
+Take BHS tenant as an example, we can test web service with curl command as below:
+```sh
 # bhs: validate web request (without client certificate)
 curl -HHost:web.bhs.orthweb.com -k -X GET https://web.bhs.orthweb.com:443/app/explorer.html -u admin:orthanc --cacert bhs.int.ca.crt
+```
+Alternatively we can browse to the URL. However, the browser may flag the self-signed certificate as insecure.
 
+## Validate DICOM service
+Take BHS tenant as an example, we can test DICOM C-ECHO and C-STORE with the following commands:
+```sh
 # bhs: validate DICOM c-echo request (with client certificate)
 echoscu -aet TESTER -aec ORTHANC -d +tls bhs.client.key bhs.client.crt -rc +cf bhs.int.ca.crt dicom.bhs.orthweb.com 11112
 
@@ -33,6 +43,7 @@ echoscu -aet TESTER -aec ORTHANC -d +tls bhs.client.key bhs.client.crt -rc +cf b
 storescu -aet TESTER -aec ORTHANC -d +tls bhs.client.key bhs.client.crt -rc +cf bhs.int.ca.crt dicom.bhs.orthweb.com 11112 DICOM_CT/0001.dcm
 ```
 
+## Verify Observability
 To check Pod logs, use Kiali. We can use port-forward to expose kiali service.
 ```sh
 kubectl port-forward svc/kiali -n monitoring 8080:20001
