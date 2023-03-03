@@ -22,7 +22,7 @@ theme:
 nav:
   - Home: 'index.md'
   - Infrastructure: 'infrastructure/index.md'
-  - Tooling: 'tooling/index.md'
+  - 'Platform Tooling': 'tooling/index.md'
   - Deployment:
     - 'Overview': 'deployment/overview.md'
     - 'GitOps Approach': 'deployment/gitops.md'

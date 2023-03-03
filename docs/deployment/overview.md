@@ -2,19 +2,17 @@
 
 While Orthanc application focuses on the core features in medical imaging, to operationalize it on Kubernetes platform, we need numerous auxiliary services for automation, traffic management, observability and security. Luckily, the cloud native ecosystem brings a plethora of open-source choices.
 
-## Foundational services
 
-Here is a glance at the technical requirements and how the chosen tools address them:
+## Source Code Repository
+The repository for Korthweb is hosted on GitHub at:
 
-* The automated deployment needs provision self-signed certificates and reference them accordingly. Korthweb uses **Cert Manager** to meet this requirement.
-* We need to control ingress traffic from client into the K8s cluster with an Ingress Controller, e.g. request routing, TLS termination Korthweb uses **Traefik CRD**, or **Istio Ingress CRD** for this requirement.
-* We need to measure responsiveness of requests and trace requests. Korthweb utilizes observability addons such as **Prometheus** and **Grafana**
-* Orthanc needs a relational database. Korthweb uses **PostgreSQL**
-* For additional layer of security, we need to configure Peer Authentication and Authorization. Korthweb uses some **Istio** CRDs
-* We need to deploy auxiliary services, Korthweb makes use of community-maintained **Helm Charts** stored in external **Helm Repo** and CLI utilities.
-* We need to orchestrate the deployment of Orthanc workloads. Korthweb leverages **FluxCD** for GitOps deployment approach, self-created **Helm Chart** for Helm deployment approach.
+[https://github.com/digihunch/korthweb](https://github.com/digihunch/korthweb)
 
-Korthweb provides artifacts to automatically deploy all the foundational services as discussed above. 
+Please clone the repository to your local command terminal. 
+```sh
+git clone git@github.com:digihunch/korthweb.git
+```
+For GitOps approach, you will need to [fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) the korthweb repo to your own GitHub account.
 
 ## Deployment Approaches
 
@@ -27,6 +25,9 @@ There are three deployment approaches. Each approach differs in complexity and l
 | [Manual](https://github.com/digihunch/korthweb/tree/main/manual) | - Istio CRD as Ingress <br> - Other Service Mesh features supported by Istio <br> - PostgreSQL <br> - Cert-Manager <br> - Observability (Lite) | - Includes artifacts for users to manually apply. <br> - Consider this option ONLY for troubleshooting or learning deployment|
 
 The artifacts of each approach are stored in eponymous sub-directories. Korthweb recommends the GitOps approach.
+
+
+
 
 ## CLI tools
 During the deployment process, we need a variety of CLI tools to interact with the cluster, such as:
