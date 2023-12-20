@@ -12,7 +12,7 @@ spec:
     name: flux-system
   path: ./gitops/dependency/bhs
   prune: true
-  validation: client
+  #validation: client
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment

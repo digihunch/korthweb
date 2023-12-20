@@ -12,7 +12,7 @@ spec:
     name: flux-system
   path: ./gitops/application/mhr
   prune: true
-  validation: client
+  # validation: client
   healthChecks:  
     - apiVersion: networking.istio.io/v1beta1 
       kind: Gateway
