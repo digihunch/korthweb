@@ -1,4 +1,4 @@
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: cert-manager
@@ -11,7 +11,7 @@ spec:
         kind: HelmRepository
         name: jetstack
         namespace: flux-system
-      version: "1.11.0"
+      version: "1.13.3"
   interval: 5m0s
   test:
     enable: true

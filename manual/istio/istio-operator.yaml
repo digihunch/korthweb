@@ -5,7 +5,7 @@ metadata:
 spec:
   profile: default
   hub: docker.io/istio
-  tag: 1.16.1
+  tag: 1.20.1
 #  revision: 1-13-2
   namespace: istio-system
   meshConfig:
@@ -25,7 +25,7 @@ spec:
             name: istiod
             patches:
             - path: spec.template.metadata.labels.version
-              value: "1.16.1"
+              value: "1.20.1"
     ingressGateways:
     - name: istio-ingressgateway
       enabled: true
@@ -65,7 +65,7 @@ spec:
             name: istio-ingressgateway 
             patches:
             - path: spec.template.metadata.labels.version
-              value: "1.16.1"
+              value: "1.20.1"
             - path: spec.template.spec.containers[name:istio-proxy].lifecycle
               value:
                 preStop:
@@ -82,4 +82,4 @@ spec:
             name: istio-egressgateway
             patches:
             - path: spec.template.metadata.labels.version
-              value: "1.16.1"
+              value: "1.20.1"

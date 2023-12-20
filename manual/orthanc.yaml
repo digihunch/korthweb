@@ -25,14 +25,16 @@ spec:
           type: RuntimeDefault
       containers:
       - name: orthanc
-        image: osimis/orthanc@sha256:20413096878fb56bf8d09af08cf4055993dbcf507526f0561b26fc4d0ed7affc #22.12.2 
+        image: osimis/orthanc@sha256:13914140549da7bb10869a75f7a7fd4ecfdc92e146da2af4917d6b85170e1525 #23.11.1 
         imagePullPolicy: Always
         args: ["/run/secrets/"]
         securityContext:
           capabilities:
             drop:
               - ALL
-          allowPrivilegeEscalation: false
+            add:
+              - DAC_OVERRIDE        # added due to creation of /etc/hostsid in docker-entrypoint.sh in bf89662d5f1964f1e59162f0f883abe97917cbc7
+          allowPrivilegeEscalation: false 
         ports:
           - containerPort: 8042
           - containerPort: 4242

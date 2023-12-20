@@ -27,13 +27,13 @@ dependencies:
   - condition: postgresql-ha.enabled 
     name: postgresql-ha
     repository: https://charts.bitnami.com/bitnami
-    version: ~11.0.1
+    version: ~12.3.3
     #alias: database # note: alias here will cause changes in service name.
     tags:
     - orthanc-database
   - condition: traefik.enabled
     name: traefik
     repository: https://helm.traefik.io/traefik
-    version: 20.8.x
+    version: 26.0.x
     tags:
     - orthanc-traefik
