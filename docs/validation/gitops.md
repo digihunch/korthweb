@@ -10,6 +10,10 @@ The first step is to make sure DNS resolution works. If you're on a Sandbox clus
 192.168.64.17 web.mhr.orthweb.com
 192.168.64.17 dicom.mhr.orthweb.com
 ```
+To find out the IP address, look for the attribute in each ingress service. For exampe:
+```sh
+kubectl -n bhs-orthweb get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+```
 
 ## Generate client certificate
 Take BHS tenant as an example, we first create a client certificate for use later.
