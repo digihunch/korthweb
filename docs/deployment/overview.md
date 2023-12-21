@@ -27,8 +27,6 @@ There are three deployment approaches. Each approach differs in complexity and l
 The artifacts of each approach are stored in eponymous sub-directories. Korthweb recommends the GitOps approach.
 
 
-
-
 ## CLI tools
 During the deployment process, we need a variety of CLI tools to interact with the cluster, such as:
 
@@ -38,3 +36,9 @@ During the deployment process, we need a variety of CLI tools to interact with t
 * [flux](https://fluxcd.io/docs/): FluxCD is a GitOps tool to keep target Kubernetes cluster in sync with the source of configuration in the GitOps directory. The name of FluxCD's CLI tool is `flux`, and we use it in the GitOps approach.
 
 Have them installed on your local environment. Ensure that `kubectl` connects to the cluster correctly. Other CLI tools `helm`, `istioctl` and `flux` all use `kubectl`'s connection profile.
+
+## Orthanc Configuration File
+
+When running as an Operating System process (non-containerized runtime), the Orthanc process expects a JSON file as  [configuration](https://orthanc.uclouvain.be/book/users/configuration.html) input. When we host Orthanc application in containers on Kubernetes, we run multiple Orthanc Pods. We have to make sure all the Orthanc Pods share a single instance of the configuration file. 
+
+Kubernetes [ConfigMaps](https://kubernetes.io/docs/concepts/configuration/configmap/) object fulfills our target here. We store the content of the JSON file as a ConfigMap. The name of the ConfigMap is `orthanc-app`. When we launch an Orthanc Pod, we tell the Pod to mount the ConfigMap entry as a file within the Pod for the Orthanc process in the Pod to consume.
