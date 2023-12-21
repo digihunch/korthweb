@@ -30,6 +30,8 @@ spec:
           capabilities:
             drop:
               - ALL
+            add:
+              - DAC_OVERRIDE
           allowPrivilegeEscalation: false
         ports:
           - containerPort: 8042

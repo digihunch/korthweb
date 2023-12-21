@@ -1,7 +1,7 @@
 
 # Korthweb - Orthanc on Kubernetes
 
-<a href="https://www.orthanc-server.com/"><img style="float" align="right" src=".asset/orthanc_logo.png"></a>
+<a href="https://www.orthanc-server.com/"><img style="float" align="right" src="docs/assets/images/orthanc_logo.png"></a>
 
 [![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?logo=kubernetes&logoColor=white)](https://www.kubernetes.io)
 [![Helm](https://img.shields.io/badge/helm-%230f1689.svg?logo=helm&logoColor=white)](https://helm.sh/)

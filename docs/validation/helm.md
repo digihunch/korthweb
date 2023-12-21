@@ -11,7 +11,7 @@ Ensure that the DNS names web.orthweb.com and dicom.orthweb.com resolve to the e
 ## Web Service
 To validate web service, export client CA and run curl command:
 ```sh
-kubectl -n orthweb get secret web.orthweb.com -o jsonpath='{.data.ca\.crt}' | base64 -d > ca.crt
+kubectl -n orthweb get secret https-secret -o jsonpath='{.data.ca\.crt}' | base64 -d > ca.crt
 
 curl -HHost:web.orthweb.com -v -k -X GET https://web.orthweb.com:443/app/explorer.html -u admin:orthanc --cacert ca.crt
 ```

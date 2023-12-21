@@ -8,7 +8,7 @@ At the end of deployment two instances are deployed, in the bhs-orthweb and mhr-
 
 ![Diagram](../assets/images/korthweb-gitops.png)
 
-Each tenant has its own namespace, where the application, routing and database are hosted. Other services such as cert-manager are shared.
+Each tenant has its own namespace, where the application, routing and database are hosted. Other services such as cert-manager are shared. Since there are multiple tenants, please ensure that the kubernetes cluster has sufficient capacity. 
 
 ## Preparation
 Ensure that you can connect to your K8s cluster with `kubectl` from your command terminal. Your user in K8s needs sufficient privilege for Flux to perform deployment activities.
@@ -52,7 +52,7 @@ When all Kustomizations show True for READY, deployment is completed.
 
 ## Troubleshooting
 
-In case of errors, below are some steps I took to troubleshoot.
+It is important to ensure that the cluster has sufficient capacity, especially if you are running on a single node test cluster. Some stacks will time out when the node does not have sufficient capacity. In case of deployment errors, below are some steps I took to troubleshoot.
 
 1. Examine status of each Kustomization. The following command is essentially the same as "fluxctl get ks":
 ```sh

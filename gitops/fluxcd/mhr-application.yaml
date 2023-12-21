@@ -1,4 +1,4 @@
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: mhr-application
@@ -12,7 +12,7 @@ spec:
     name: flux-system
   path: ./gitops/application/mhr
   prune: true
-  validation: client
+  # validation: client
   healthChecks:  
     - apiVersion: networking.istio.io/v1beta1 
       kind: Gateway

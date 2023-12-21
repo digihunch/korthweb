@@ -10,7 +10,7 @@ transformers:
 images:
 - name: orthanc-plugins
   newName: osimis/orthanc 
-  digest: sha256:20413096878fb56bf8d09af08cf4055993dbcf507526f0561b26fc4d0ed7affc
+  digest: 13914140549da7bb10869a75f7a7fd4ecfdc92e146da2af4917d6b85170e1525 
 patchesStrategicMerge:
 - |-
   apiVersion: v1

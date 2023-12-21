@@ -1,4 +1,4 @@
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: kiali
@@ -11,7 +11,7 @@ spec:
         kind: HelmRepository
         name: kiali 
         namespace: flux-system
-      version: "1.48.0"
+      version: "1.78.0"
   interval: 1h0m0s
   install:
     remediation:
